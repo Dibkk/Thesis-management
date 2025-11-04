@@ -25,7 +25,7 @@ export default function HomePage() {
           </div>
         </div>
       </header>
-
+      <div></div>
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto text-center max-w-4xl">
