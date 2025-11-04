@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { MongoClient, GridFSBucket } from "mongodb";
 
 let bucket: GridFSBucket | null = null;
+const a = 10;
 
 export const connectDatabase = async () => {
   try {
