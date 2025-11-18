@@ -22,3 +22,5 @@ const ThesisSchema = new Schema<IThesis>(
     timestamps: true, // เพิ่ม createdAt, updatedAt ให้อัตโนมัติ
   }
 );
+
+export const Thesis = mongoose.models.Thesis || mongoose.model('Thesis', ThesisSchema)
