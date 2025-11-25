@@ -10,56 +10,98 @@ import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import Navbar from "@/components/navbar"
-import { User, Mail, Shield, Calendar, Edit, Save, X } from "lucide-react"
+import { User, Mail, Shield, Calendar, Edit, Save, X, Loader2 } from "lucide-react" 
+import { AnimatePresence} from "framer-motion"
+import { AlertCircle } from "lucide-react"
 
 interface UserProfile {
-  name: string
-  email: string
-  role: string
-  joinDate?: string
-  department?: string
-  studentId?: string
+  id: string;
+  firstname?: string;
+  lastname?: string;
+  email: string;
+  role: string;
+  joinDate?: string; 
+  department?: string;
+  studentId?: string; 
+  user_id?: string;  
+  bio?: string;       
 }
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [isEditing, setIsEditing] = useState(false)
-  const [editForm, setEditForm] = useState<UserProfile>({
-    name: "",
-    email: "",
-    role: "",
-    department: "",
-    studentId: "",
-  })
+  
+
+  const [editForm, setEditForm] = useState<Partial<UserProfile>>({}) 
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null); 
+  const [loadingUser, setLoadingUser] = useState(true); 
   const router = useRouter()
 
   useEffect(() => {
-    const userData = localStorage.getItem("user")
-    if (!userData) {
-      router.push("/login")
-      return
-    }
+    async function fetchUser() {
+      setLoadingUser(true);
+      try {
+        const res = await fetch('/api/auth/me'); 
+        if (!res.ok) throw new Error('Not authenticated');
 
-    const parsedUser = JSON.parse(userData)
-    // Add mock additional data
-    const fullUser = {
-      ...parsedUser,
-      joinDate: "January 2024",
-      department: parsedUser.role === "student" ? "Computer Science" : "Engineering",
-      studentId: parsedUser.role === "student" ? "CS2024001" : undefined,
+        const data = await res.json();
+        if (data.success) {
+          const fullUser = {
+            ...data.user,
+            joinDate: "January 2024", 
+            studentId: data.user.user_id, 
+            bio: data.user.bio || ""
+          }
+          setUser(fullUser);
+          setEditForm(fullUser); 
+        } else {
+          throw new Error(data.error);
+        }
+      } catch (error) {
+        router.push("/login");
+      } finally {
+        setLoadingUser(false);
+      }
     }
-
-    setUser(fullUser)
-    setEditForm(fullUser)
+    fetchUser();
   }, [router])
 
-  const handleSave = () => {
-    if (user) {
-      const updatedUser = { ...user, ...editForm }
-      setUser(updatedUser)
-      localStorage.setItem("user", JSON.stringify(updatedUser))
-      setIsEditing(false)
+  const handleSave = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PUT', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editForm), 
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        const updatedFullUser = {
+          ...data.user,
+          joinDate: user?.joinDate || "January 2024", 
+          studentId: data.user.user_id, 
+        };
+        localStorage.setItem("user", JSON.stringify(data.user)); 
+        setUser(updatedFullUser);
+        setEditForm(updatedFullUser);
+        setIsEditing(false);
+        setError(null);
+      } else {
+        setError(data.message || 'Failed to update profile.');
+      }
+    } catch (error: any) {
+      console.log('Profile update error:', error);
+      setError(error.message || 'Server error');
     }
+    setIsLoading(false);
   }
 
   const handleCancel = () => {
@@ -67,15 +109,19 @@ export default function ProfilePage() {
       setEditForm(user)
     }
     setIsEditing(false)
+    setError(null);
   }
 
-  if (!user) {
+  if (loadingUser || !user) { 
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     )
   }
+
+  const displayName = `${user.firstname || ''} ${user.lastname || ''}`.trim() || "User"
+  const initials = (user.firstname || 'U').charAt(0).toUpperCase()
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,11 +133,24 @@ export default function ProfilePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-heading font-bold text-foreground mb-2">Profile</h1>
           <p className="text-muted-foreground">Manage your account information and preferences</p>
         </div>
+
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="mb-4 p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md flex items-center gap-2"
+            >
+              <AlertCircle className="h-4 w-4" />
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Card */}
@@ -104,10 +163,10 @@ export default function ProfilePage() {
               <CardContent className="p-6 text-center">
                 <Avatar className="h-24 w-24 mx-auto mb-4">
                   <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-                    {user.name.charAt(0).toUpperCase()}
+                    {initials}
                   </AvatarFallback>
                 </Avatar>
-                <h2 className="text-xl font-heading font-bold text-foreground mb-2">{user.name}</h2>
+                <h2 className="text-xl font-heading font-bold text-foreground mb-2">{displayName}</h2>
                 <p className="text-muted-foreground mb-4">{user.email}</p>
                 <Badge className="mb-4 capitalize bg-gradient-to-r from-blue-600 to-green-600 text-white">
                   {user.role}
@@ -134,7 +193,6 @@ export default function ProfilePage() {
             </Card>
           </motion.div>
 
-          {/* Profile Information */}
           <motion.div
             className="lg:col-span-2"
             initial={{ opacity: 0, x: 20 }}
@@ -157,11 +215,11 @@ export default function ProfilePage() {
                   </Button>
                 ) : (
                   <div className="flex gap-2">
-                    <Button onClick={handleSave} size="sm">
-                      <Save className="h-4 w-4 mr-2" />
+                    <Button onClick={handleSave} size="sm" disabled={isLoading}>
+                      {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                       Save
                     </Button>
-                    <Button onClick={handleCancel} variant="outline" size="sm">
+                    <Button onClick={handleCancel} variant="outline" size="sm" disabled={isLoading}>
                       <X className="h-4 w-4 mr-2" />
                       Cancel
                     </Button>
@@ -169,29 +227,54 @@ export default function ProfilePage() {
                 )}
               </CardHeader>
               <CardContent className="space-y-6">
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
+                    <Label htmlFor="firstname">First Name</Label>
                     {isEditing ? (
                       <motion.div
                         whileFocus={{ boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)" }}
                         transition={{ duration: 0.2 }}
                       >
                         <Input
-                          id="name"
-                          value={editForm.name}
-                          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                          id="firstname"
+                          value={editForm.firstname || ''}
+                          onChange={(e) => setEditForm({ ...editForm, firstname: e.target.value })}
                           className="focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
                         />
                       </motion.div>
                     ) : (
                       <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
                         <User className="h-4 w-4 text-muted-foreground" />
-                        <span>{user.name}</span>
+                        <span>{user.firstname || '...'}</span>
                       </div>
                     )}
                   </div>
 
+                  <div className="space-y-2">
+                    <Label htmlFor="lastname">Last Name</Label>
+                    {isEditing ? (
+                      <motion.div
+                        whileFocus={{ boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)" }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Input
+                          id="lastname"
+                          value={editForm.lastname || ''}
+                          onChange={(e) => setEditForm({ ...editForm, lastname: e.target.value })}
+                          className="focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
+                        />
+                      </motion.div>
+                    ) : (
+                      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span>{user.lastname || '...'}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
                     {isEditing ? (
@@ -245,37 +328,24 @@ export default function ProfilePage() {
                     )}
                   </div>
 
+                 
                   {user.role === "student" && (
                     <div className="space-y-2">
                       <Label htmlFor="studentId">Student ID</Label>
-                      {isEditing ? (
-                        <motion.div
-                          whileFocus={{ boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)" }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <Input
-                            id="studentId"
-                            value={editForm.studentId || ""}
-                            onChange={(e) => setEditForm({ ...editForm, studentId: e.target.value })}
-                            className="focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
-                          />
-                        </motion.div>
-                      ) : (
-                        <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          <span>{user.studentId || "Not specified"}</span>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span>{user.studentId || "Not specified"}</span>
+                      </div>
                     </div>
                   )}
 
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <Label htmlFor="joinDate">Join Date</Label>
                     <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       <span>{user.joinDate}</span>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </CardContent>
             </Card>
@@ -326,5 +396,8 @@ export default function ProfilePage() {
         </motion.div>
       </motion.div>
     </div>
+
+    //   </motion.div>
+    // </div>
   )
 }

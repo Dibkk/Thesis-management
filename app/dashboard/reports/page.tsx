@@ -15,7 +15,6 @@ import { Separator } from "@/components/ui/separator"
 import { format } from "date-fns"
 import { Download, FileText, BarChart3, CalendarIcon, Users, BookOpen, TrendingUp, Clock } from "lucide-react"
 
-// Mock user data
 const mockUser = {
   id: "1",
   name: "Dr. Admin",
@@ -24,7 +23,7 @@ const mockUser = {
   department: "Administration",
 }
 
-// Mock report templates
+
 const reportTemplates = [
   {
     id: "thesis-summary",
@@ -114,7 +113,7 @@ export default function ReportsPage() {
   const handleTemplateSelect = (template: any) => {
     setSelectedTemplate(template)
     setReportName(`${template.name} - ${format(new Date(), "MMMM yyyy")}`)
-    setSelectedFields(template.fields.slice(0, 5)) // Select first 5 fields by default
+    setSelectedFields(template.fields.slice(0, 5))
   }
 
   const handleFieldToggle = (field: string, checked: boolean) => {

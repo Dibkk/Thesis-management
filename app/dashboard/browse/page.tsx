@@ -1,197 +1,173 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { motion, AnimatePresence } from "framer-motion"
+import Link from "next/link"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Search, Filter, Download, Eye, Calendar, User, BookOpen, TrendingUp } from "lucide-react"
+import { Search, Filter, BookOpen, User, Calendar, Download, FileText, Tag, X, Eye } from "lucide-react"
 
-// Mock user data
-const mockUser = {
-  id: "1",
-  name: "John Doe",
-  email: "john.doe@university.edu",
-  role: "student" as const,
-  department: "Computer Science",
+interface IThesis {
+  _id: string;
+  thesis_id: string;
+  title: string;
+  abstract: string;
+  category: string;
+  year: string;
+  keywords: string;
+  status: string;
+  file_path: string;
+  department: string;
+  isPublic: boolean;
+  author: {
+    firstName: string;
+    lastName: string;
+  };
+  advisor: {
+    firstName: string;
+    lastName: string;
+  };
+  createdAt: string;
+  downloads?: number;
 }
 
-// Mock thesis data
-const mockTheses = [
-  {
-    id: "1",
-    title: "Machine Learning Applications in Healthcare Diagnosis",
-    author: "Alice Johnson",
-    advisor: "Dr. Jane Smith",
-    year: 2024,
-    category: "Computer Science",
-    department: "Computer Science",
-    keywords: ["machine learning", "healthcare", "diagnosis"],
-    abstract: "This thesis explores the application of machine learning algorithms in medical diagnosis...",
-    downloads: 245,
-    publishedDate: "2024-01-15",
-    status: "published",
-    accessLevel: "public",
-  },
-  {
-    id: "2",
-    title: "Blockchain Security in Financial Systems",
-    author: "Bob Smith",
-    advisor: "Dr. Michael Johnson",
-    year: 2024,
-    category: "Computer Science",
-    department: "Computer Science",
-    keywords: ["blockchain", "security", "finance"],
-    abstract: "An analysis of blockchain technology security measures in modern financial systems...",
-    downloads: 189,
-    publishedDate: "2024-01-10",
-    status: "published",
-    accessLevel: "university",
-  },
-  {
-    id: "3",
-    title: "Sustainable Energy Solutions for Urban Development",
-    author: "Carol Davis",
-    advisor: "Dr. Sarah Wilson",
-    year: 2023,
-    category: "Engineering",
-    department: "Environmental Engineering",
-    keywords: ["sustainability", "energy", "urban planning"],
-    abstract: "Research on implementing sustainable energy solutions in urban development projects...",
-    downloads: 312,
-    publishedDate: "2023-12-20",
-    status: "published",
-    accessLevel: "public",
-  },
-  {
-    id: "4",
-    title: "Quantum Computing Algorithms for Optimization",
-    author: "David Brown",
-    advisor: "Dr. Robert Lee",
-    year: 2023,
-    category: "Physics",
-    department: "Physics",
-    keywords: ["quantum computing", "algorithms", "optimization"],
-    abstract: "Development of quantum algorithms for solving complex optimization problems...",
-    downloads: 156,
-    publishedDate: "2023-11-15",
-    status: "published",
-    accessLevel: "public",
-  },
-  {
-    id: "5",
-    title: "Neural Networks in Natural Language Processing",
-    author: "Emma Wilson",
-    advisor: "Dr. Lisa Chen",
-    year: 2023,
-    category: "Computer Science",
-    department: "Computer Science",
-    keywords: ["neural networks", "NLP", "deep learning"],
-    abstract: "Advanced neural network architectures for natural language processing tasks...",
-    downloads: 278,
-    publishedDate: "2023-10-30",
-    status: "published",
-    accessLevel: "university",
-  },
-]
+const CATEGORIES = [
+  { value: "computer-science", label: "Computer Science" },
+  { value: "engineering", label: "Engineering" },
+  { value: "mathematics", label: "Mathematics" },
+  { value: "physics", label: "Physics" },
+  { value: "biology", label: "Biology" },
+  { value: "chemistry", label: "Chemistry" },
+  { value: "business", label: "Business" },
+  { value: "psychology", label: "Psychology" },
+  { value: "other", label: "Other" },
+];
+
+
+const YEARS = ["2025", "2024", "2023", "2022", "2021", "2020"];
 
 export default function BrowsePage() {
-  const [user] = useState(mockUser)
+  const [theses, setTheses] = useState<IThesis[]>([]) 
+  const [filteredTheses, setFilteredTheses] = useState<IThesis[]>([])
+  const [loading, setLoading] = useState(true)
+
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState("relevance")
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]) 
   const [selectedYears, setSelectedYears] = useState<string[]>([])
-  const [selectedAccessLevel, setSelectedAccessLevel] = useState<string[]>([])
-  const [filteredTheses, setFilteredTheses] = useState(mockTheses)
-
-  const categories = ["Computer Science", "Engineering", "Physics", "Mathematics", "Biology", "Chemistry", "Business"]
-  const years = ["2024", "2023", "2022", "2021", "2020"]
-  const accessLevels = ["public", "university", "restricted"]
-
-  const handleSearch = () => {
-    let filtered = mockTheses
-
-    // Filter by search query
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (thesis) =>
-          thesis.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          thesis.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          thesis.keywords.some((keyword) => keyword.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          thesis.abstract.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    }
-
-    // Filter by categories
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter((thesis) => selectedCategories.includes(thesis.category))
-    }
-
-    // Filter by years
-    if (selectedYears.length > 0) {
-      filtered = filtered.filter((thesis) => selectedYears.includes(thesis.year.toString()))
-    }
-
-    // Filter by access level
-    if (selectedAccessLevel.length > 0) {
-      filtered = filtered.filter((thesis) => selectedAccessLevel.includes(thesis.accessLevel))
-    }
-
-    // Sort results
-    if (sortBy === "date") {
-      filtered.sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime())
-    } else if (sortBy === "downloads") {
-      filtered.sort((a, b) => b.downloads - a.downloads)
-    } else if (sortBy === "title") {
-      filtered.sort((a, b) => a.title.localeCompare(b.title))
-    }
-
-    setFilteredTheses(filtered)
-  }
-
-  const handleCategoryChange = (category: string, checked: boolean) => {
-    if (checked) {
-      setSelectedCategories([...selectedCategories, category])
-    } else {
-      setSelectedCategories(selectedCategories.filter((c) => c !== category))
-    }
-  }
-
-  const handleYearChange = (year: string, checked: boolean) => {
-    if (checked) {
-      setSelectedYears([...selectedYears, year])
-    } else {
-      setSelectedYears(selectedYears.filter((y) => y !== year))
-    }
-  }
-
-  const handleAccessLevelChange = (level: string, checked: boolean) => {
-    if (checked) {
-      setSelectedAccessLevel([...selectedAccessLevel, level])
-    } else {
-      setSelectedAccessLevel(selectedAccessLevel.filter((l) => l !== level))
-    }
-  }
-
-  const clearFilters = () => {
-    setSelectedCategories([])
-    setSelectedYears([])
-    setSelectedAccessLevel([])
-    setSearchQuery("")
-    setFilteredTheses(mockTheses)
-  }
+  const [selectedAccess, setSelectedAccess] = useState<string[]>([])
 
   useEffect(() => {
-    handleSearch()
-  }, [searchQuery, selectedCategories, selectedYears, selectedAccessLevel, sortBy])
+    async function fetchData() {
+      try {
+        const res = await fetch('/api/query/thesis');
+        const data = await res.json();
+        if (data.success) {
+          setTheses(data.theses);
+          setFilteredTheses(data.theses);
+        }
+      } catch (error) {
+        console.error("Failed to fetch theses:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const getCategoryLabel = (value: string) => {
+    const cat = CATEGORIES.find(c => c.value === value);
+    return cat ? cat.label : value || "Uncategorized";
+  };
+
+  useEffect(() => {
+    let result = theses;
+
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter((thesis) => {
+          const title = thesis.title || "";
+          const abstract = thesis.abstract || "";
+          const keywords = thesis.keywords || "";
+          const thesisId = thesis.thesis_id || "";
+          const authorName = thesis.author ? `${thesis.author.firstName} ${thesis.author.lastName}` : "";
+          
+          return (
+            title.toLowerCase().includes(query) ||
+            authorName.toLowerCase().includes(query) ||
+            abstract.toLowerCase().includes(query) ||
+            keywords.toLowerCase().includes(query) ||
+            thesisId.toLowerCase().includes(query)
+          )
+      });
+    }
+
+    if (selectedCategories.length > 0) {
+      result = result.filter((thesis) => selectedCategories.includes(thesis.category));
+    }
+
+    if (selectedYears.length > 0) {
+      result = result.filter((thesis) => selectedYears.includes(thesis.year));
+    }
+
+    if (selectedAccess.length > 0) {
+      result = result.filter((thesis) => {
+        const status = thesis.isPublic ? "public" : "restricted";
+        return selectedAccess.includes(status);
+      });
+    }
+
+    if (sortBy === "date") {
+      result.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+    } else if (sortBy === "title") {
+      result.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+    }
+
+    setFilteredTheses(result);
+
+  }, [searchQuery, selectedCategories, selectedYears, selectedAccess, sortBy, theses]);
+
+
+  const toggleCategory = (value: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(value) ? prev.filter(c => c !== value) : [...prev, value]
+    );
+  };
+
+  const toggleYear = (value: string) => {
+    setSelectedYears(prev => 
+      prev.includes(value) ? prev.filter(y => y !== value) : [...prev, value]
+    );
+  };
+
+  const toggleAccess = (value: string) => {
+    setSelectedAccess(prev => 
+      prev.includes(value) ? prev.filter(a => a !== value) : [...prev, value]
+    );
+  };
+
+  const clearFilters = () => {
+    setSelectedCategories([]);
+    setSelectedYears([]);
+    setSelectedAccess([]);
+    setSearchQuery("");
+  };
+
+  if (loading) {
+     return (
+      <div className="flex items-center justify-center p-8 min-h-screen"> 
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
 
   return (
-    <DashboardLayout user={user}>
       <div className="p-6 max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-heading font-bold text-foreground mb-2">Browse Theses</h1>
@@ -199,7 +175,8 @@ export default function BrowsePage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Filters Sidebar */}
+          
+          {/* --- Left Sidebar (Filters) --- */}
           <div className="lg:col-span-1">
             <Card className="sticky top-6">
               <CardHeader>
@@ -207,40 +184,44 @@ export default function BrowsePage() {
                   <Filter className="h-5 w-5" />
                   Filters
                 </CardTitle>
-                <CardDescription>Refine your search results</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Search Input */}
+                
+                {/* Search */}
                 <div className="space-y-2">
-                  <Label htmlFor="search">Search</Label>
+                  <Label>Search</Label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                      id="search"
-                      placeholder="Search theses..."
+                      placeholder="Keywords, Title, ID..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-10"
                     />
+                    {searchQuery && (
+                       <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                         <X className="h-4 w-4" />
+                       </button>
+                    )}
                   </div>
                 </div>
 
                 <Separator />
 
-                {/* Categories */}
+                {/* Filter: Categories (ลบ max-h ออก เพื่อให้โชว์เต็มๆ) */}
                 <div className="space-y-3">
                   <Label className="text-sm font-medium">Categories</Label>
                   <div className="space-y-2">
-                    {categories.map((category) => (
-                      <div key={category} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`category-${category}`}
-                          checked={selectedCategories.includes(category)}
-                          onCheckedChange={(checked) => handleCategoryChange(category, checked as boolean)}
+                    {CATEGORIES.map((cat) => (
+                      <div key={cat.value} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`cat-${cat.value}`} 
+                          checked={selectedCategories.includes(cat.value)}
+                          onCheckedChange={() => toggleCategory(cat.value)}
                         />
-                        <Label htmlFor={`category-${category}`} className="text-sm">
-                          {category}
-                        </Label>
+                        <label htmlFor={`cat-${cat.value}`} className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
+                          {cat.label}
+                        </label>
                       </div>
                     ))}
                   </div>
@@ -248,20 +229,20 @@ export default function BrowsePage() {
 
                 <Separator />
 
-                {/* Years */}
+                {/* Filter: Year (ใช้ YEARS คงที่) */}
                 <div className="space-y-3">
                   <Label className="text-sm font-medium">Publication Year</Label>
                   <div className="space-y-2">
-                    {years.map((year) => (
+                    {YEARS.map((year) => (
                       <div key={year} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`year-${year}`}
+                        <Checkbox 
+                          id={`year-${year}`} 
                           checked={selectedYears.includes(year)}
-                          onCheckedChange={(checked) => handleYearChange(year, checked as boolean)}
+                          onCheckedChange={() => toggleYear(year)}
                         />
-                        <Label htmlFor={`year-${year}`} className="text-sm">
+                        <label htmlFor={`year-${year}`} className="text-sm leading-none cursor-pointer">
                           {year}
-                        </Label>
+                        </label>
                       </div>
                     ))}
                   </div>
@@ -269,46 +250,42 @@ export default function BrowsePage() {
 
                 <Separator />
 
-                {/* Access Level */}
+                {/* Filter: Access Level */}
                 <div className="space-y-3">
                   <Label className="text-sm font-medium">Access Level</Label>
                   <div className="space-y-2">
-                    {accessLevels.map((level) => (
-                      <div key={level} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`access-${level}`}
-                          checked={selectedAccessLevel.includes(level)}
-                          onCheckedChange={(checked) => handleAccessLevelChange(level, checked as boolean)}
-                        />
-                        <Label htmlFor={`access-${level}`} className="text-sm capitalize">
-                          {level}
-                        </Label>
-                      </div>
-                    ))}
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="access-public" 
+                        checked={selectedAccess.includes("public")}
+                        onCheckedChange={() => toggleAccess("public")}
+                      />
+                      <label htmlFor="access-public" className="text-sm leading-none cursor-pointer">Public</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="access-restricted" 
+                        checked={selectedAccess.includes("restricted")}
+                        onCheckedChange={() => toggleAccess("restricted")}
+                      />
+                      <label htmlFor="access-restricted" className="text-sm leading-none cursor-pointer">Restricted</label>
+                    </div>
                   </div>
                 </div>
 
-                <Separator />
-
-                <div className="space-y-3">
-                  <Button onClick={clearFilters} variant="outline" className="w-full bg-transparent">
-                    Clear All
-                  </Button>
-                </div>
+                <Button onClick={clearFilters} variant="outline" className="w-full">
+                  Clear All Filters
+                </Button>
               </CardContent>
             </Card>
           </div>
 
-          {/* Results */}
+          {/* --- Right Content (Results) --- */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Results Header */}
             <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-heading font-semibold">
-                  {filteredTheses.length} {filteredTheses.length === 1 ? "thesis" : "theses"} found
-                </h2>
-                <p className="text-sm text-muted-foreground">{searchQuery && `Results for "${searchQuery}"`}</p>
-              </div>
+              <p className="text-sm text-muted-foreground">
+                Found {filteredTheses.length} results
+              </p>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-48">
                   <SelectValue />
@@ -316,106 +293,103 @@ export default function BrowsePage() {
                 <SelectContent>
                   <SelectItem value="relevance">Sort by Relevance</SelectItem>
                   <SelectItem value="date">Sort by Date</SelectItem>
-                  <SelectItem value="downloads">Sort by Downloads</SelectItem>
                   <SelectItem value="title">Sort by Title</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Results List */}
             <div className="space-y-4">
-              {filteredTheses.map((thesis) => (
-                <Card key={thesis.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      {/* Header */}
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-2 flex-1">
-                          <h3 className="text-lg font-heading font-semibold text-foreground hover:text-primary cursor-pointer">
-                            {thesis.title}
-                          </h3>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <User className="h-4 w-4" />
-                              {thesis.author}
+              <AnimatePresence mode="popLayout">
+                {filteredTheses.length > 0 ? (
+                  filteredTheses.map((thesis) => (
+                    <motion.div key={thesis._id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                      <Card className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-6">
+                          <div className="space-y-4">
+                            <div className="flex items-start justify-between">
+                              <div className="space-y-2 flex-1">
+                                {/* Link Title */}
+                                <Link href={`/dashboard/thesis/${thesis._id}`} className="group-hover:text-blue-600 transition-colors">
+                                  <h3 className="text-lg font-heading font-semibold text-foreground hover:text-primary cursor-pointer">
+                                    {thesis.title || "Untitled Thesis"}
+                                  </h3>
+                                </Link>
+                                
+                                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                  <div className="flex items-center gap-1">
+                                    <User className="h-4 w-4" />
+                                    {thesis.author ? `${thesis.author.firstName} ${thesis.author.lastName}` : 'Unknown Author'}
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Calendar className="h-4 w-4" />
+                                    {thesis.year || "N/A"}
+                                  </div>
+                                  {/* --- แสดง Category บน Card --- */}
+                                  <div className="flex items-center gap-1">
+                                    <Tag className="h-4 w-4" />
+                                    <Badge variant="secondary" className="font-normal">
+                                      {getCategoryLabel(thesis.category)}
+                                    </Badge>
+                                  </div>
+                                  {/* ----------------------------- */}
+                                </div>
+                              </div>
+                              
+                              <div className="flex flex-col gap-2 items-end">
+                                <Badge variant={thesis.isPublic ? "secondary" : "outline"}>
+                                  {thesis.isPublic ? "Public" : "Restricted"}
+                                </Badge>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4" />
-                              {thesis.year}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <BookOpen className="h-4 w-4" />
-                              {thesis.department}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <TrendingUp className="h-4 w-4" />
-                              {thesis.downloads} downloads
+
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {thesis.abstract || "No abstract available."}
+                            </p>
+
+                            {thesis.keywords && (
+                              <div className="flex flex-wrap gap-2">
+                                {thesis.keywords.split(',').map((keyword, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {keyword.trim()}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+
+                            <div className="flex items-center justify-between pt-2 border-t mt-4">
+                               <div className="text-xs text-muted-foreground">
+                                  Thesis ID: {thesis.thesis_id || "-"}
+                               </div>
+                               <div className="flex gap-2">
+                                  <Button variant="outline" size="sm" asChild>
+                                    <Link href={`/dashboard/thesis/${thesis._id}`}>
+                                       <Eye className="h-4 w-4 mr-2" />
+                                       View
+                                    </Link>
+                                  </Button>
+                                  <Button variant="outline" size="sm" asChild>
+                                     <a href={thesis.file_path || "#"} download>
+                                       <Download className="h-4 w-4 mr-2" />
+                                       Download
+                                     </a>
+                                  </Button>
+                               </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">{thesis.category}</Badge>
-                          <Badge
-                            variant={thesis.accessLevel === "public" ? "secondary" : "outline"}
-                            className="capitalize"
-                          >
-                            {thesis.accessLevel}
-                          </Badge>
-                        </div>
-                      </div>
-
-                      {/* Abstract */}
-                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{thesis.abstract}</p>
-
-                      {/* Keywords */}
-                      <div className="flex flex-wrap gap-2">
-                        {thesis.keywords.map((keyword, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {keyword}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex items-center justify-between pt-2">
-                        <div className="text-sm text-muted-foreground">
-                          Advisor: {thesis.advisor} • Published {new Date(thesis.publishedDate).toLocaleDateString()}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4 mr-2" />
-                            View
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Download className="h-4 w-4 mr-2" />
-                            Download
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="text-center py-12 bg-muted/10 rounded-xl border-2 border-dashed">
+                    <p className="text-muted-foreground">No theses found matching your criteria.</p>
+                    <Button variant="link" onClick={clearFilters}>Clear Filters</Button>
+                  </div>
+                )}
+              </AnimatePresence>
             </div>
-
-            {/* No Results */}
-            {filteredTheses.length === 0 && (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-heading font-semibold mb-2">No theses found</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Try adjusting your search criteria or clearing some filters.
-                  </p>
-                  <Button onClick={clearFilters} variant="outline">
-                    Clear Filters
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
           </div>
         </div>
       </div>
-    </DashboardLayout>
   )
 }

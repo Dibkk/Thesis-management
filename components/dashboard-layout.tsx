@@ -18,6 +18,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { GlobalSearch } from "@/components/global-search"
 import { NotificationBell } from "@/components/notification-bell"
+import { useTheme } from "next-themes" 
 import {
   BookOpen,
   Home,
@@ -34,13 +35,17 @@ import {
   Clock,
   CheckCircle,
   MessageSquare,
+  User, 
+  Sun, 
+  Moon, 
 } from "lucide-react"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
-  user: {
+  user?: { 
     id: string
-    name: string
+    firstname: string
+    lastname: string
     email: string
     role: "student" | "advisor" | "admin"
     department: string
@@ -49,23 +54,46 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, user }: DashboardLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { theme, setTheme } = useTheme() 
+
+  const handleLogout = async () => {
+    console.log("dashboard handleLogout called")
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+    } catch (e) {
+      console.error("Logout fetch error:", e);
+    }
+    window.location.href = '/login'
+  }
+
+  const displayName = user?.firstname + " " + user?.lastname || "Guest"
+  const initials = (
+    (user?.firstname + " " + user?.lastname)
+      .split(" ")
+      .filter(Boolean)
+      .map((n) => n[0])
+      .join("") || "U"
+  )
 
   const getNavigationItems = () => {
     const baseItems = [{ icon: Home, label: "Dashboard", href: "/dashboard" }]
+    if (!user) return baseItems
 
     const roleSpecificItems = {
       student: [
         { icon: FileText, label: "My Thesis", href: "/dashboard/thesis" },
         { icon: Upload, label: "Upload", href: "/dashboard/upload" },
-        { icon: Clock, label: "Progress", href: "/dashboard/progress" },
+        // { icon: Clock, label: "Progress", href: "/dashboard/progress" },
         { icon: Search, label: "Browse", href: "/dashboard/browse" },
-        { icon: Bell, label: "Notifications", href: "/dashboard/notifications" },
+        // { icon: Bell, label: "Notifications", href: "/dashboard/notifications" },
       ],
       advisor: [
         { icon: Users, label: "Students", href: "/dashboard/students" },
         { icon: FileText, label: "Reviews", href: "/dashboard/reviews" },
         { icon: CheckCircle, label: "Approvals", href: "/dashboard/approvals" },
-        { icon: BarChart3, label: "Analytics", href: "/dashboard/analytics" },
+        // { icon: BarChart3, label: "Analytics", href: "/dashboard/analytics" },
         { icon: Search, label: "Browse", href: "/dashboard/browse" },
         { icon: Bell, label: "Notifications", href: "/dashboard/notifications" },
       ],
@@ -132,9 +160,9 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
       >
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="capitalize">
-            {user.role}
+            {user?.role ?? "guest"}
           </Badge>
-          <span className="text-xs text-sidebar-foreground/70">{user.department}</span>
+          <span className="text-xs text-sidebar-foreground/70">{user?.department ?? ""}</span>
         </div>
       </motion.div>
     </motion.div>
@@ -173,47 +201,65 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
               </SheetTrigger>
             </Sheet>
 
-            <h2 className="font-heading font-semibold text-card-foreground">Welcome back, {user.name.split(" ")[0]}</h2>
+            <h2 className="font-heading font-semibold text-card-foreground">Welcome back, {displayName}</h2>
           </div>
 
           <div className="flex items-center gap-4">
             <GlobalSearch />
-
-            {/* Notifications */}
             <NotificationBell />
+
+            {/* ปุ่มเปลี่ยนธีม (ถูกต้อง) */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            </Button>
 
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" alt={user.name} />
-                    <AvatarFallback>
-                      {user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
+                    <AvatarImage src="/placeholder.svg?height=32&width=32" alt={displayName} />
+                    <AvatarFallback>{initials}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{user.name}</p>
-                    <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                    <p className="text-sm font-medium leading-none">{displayName}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user?.email ?? ""}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                
+                {/* ปุ่ม Profile (ถูกต้อง) */}
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href="/profile">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+
                 <DropdownMenuItem>
                   <Shield className="mr-2 h-4 w-4" />
                   <span>Admin Panel</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                
+                {/* 2. --- onSelect={handleLogout} ถูกต้องแล้ว --- */}
+                <DropdownMenuItem 
+                  onSelect={handleLogout} 
+                  className="cursor-pointer"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
+                
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
