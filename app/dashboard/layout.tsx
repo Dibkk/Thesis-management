@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { DashboardLayout } from '@/components/dashboard-layout' 
-import { Skeleton } from '@/components/ui/skeleton'
+import { LoadingScreen } from '@/components/loading'
 import type React from "react"
 
 interface AppUser {
@@ -35,11 +35,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
         if (data.success) {
           setUser(data.user); 
+          localStorage.setItem('user', JSON.stringify(data.user)); 
         } else {
           throw new Error(data.error || 'Failed to fetch user');
         }
       } catch ( error : any) {
-        console.error("Auth Error (Layout):", (error as Error).message);
+        console.log("Auth check: Redirecting to login -", (error as Error).message);
         router.push('/login'); 
       } finally {
         setLoading(false); 
@@ -50,7 +51,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [router]); 
 
   if (loading || !user) {
-    return <Skeleton className="w-full h-screen" />
+    return <LoadingScreen />
   }
   
 

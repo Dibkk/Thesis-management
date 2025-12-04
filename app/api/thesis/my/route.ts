@@ -24,9 +24,23 @@ export async function GET() {
 
     await connectDatabase();
 
-    const theses = await Thesis.find({ author: userId })
-      .populate('advisor', 'firstName lastName') 
+    const allTheses = await Thesis.find({ author: userId })
+      .populate('advisor', 'firstName lastName')
       .sort({ createdAt: -1 });
+
+    // Filter เอาเฉพาะ Version ล่าสุดของแต่ละ thesis_id
+    const latestThesesMap = new Map();
+    allTheses.forEach((t: any) => {
+      if (!latestThesesMap.has(t.thesis_id)) {
+        latestThesesMap.set(t.thesis_id, t);
+      } else {
+        const current = latestThesesMap.get(t.thesis_id);
+        if (t.version > current.version) {
+          latestThesesMap.set(t.thesis_id, t);
+        }
+      }
+    });
+    const theses = Array.from(latestThesesMap.values());
 
     return NextResponse.json({ success: true, theses });
 

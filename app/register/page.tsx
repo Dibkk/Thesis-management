@@ -112,13 +112,15 @@ export default function RegisterPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-heading font-bold">
+          <Link href="/" className="inline-flex items-center gap-3 mb-4">
+            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg shadow-blue-500/30">
+              <BookOpen className="h-7 w-7 text-white" />
+            </div>
+            <span className="text-2xl font-heading font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Thesis Management
             </span>
           </Link>
-          <h1 className="text-3xl font-heading font-bold text-foreground mb-2">
+          <h1 className="text-3xl font-heading font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
             Create Account
           </h1>
           <p className="text-muted-foreground">
@@ -132,7 +134,7 @@ export default function RegisterPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="rounded-2xl border-0 shadow-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+          <Card className="rounded-2xl border-0 shadow-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
             <CardHeader>
               <CardTitle className="font-heading">Register</CardTitle>
               <CardDescription>

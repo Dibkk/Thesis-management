@@ -61,11 +61,13 @@ export default function LoginPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-heading font-bold">Thesis Management</span>
+          <Link href="/" className="inline-flex items-center gap-3 mb-4">
+            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg shadow-blue-500/30">
+              <BookOpen className="h-7 w-7 text-white" />
+            </div>
+            <span className="text-2xl font-heading font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Thesis Management</span>
           </Link>
-          <h1 className="text-3xl font-heading font-bold text-foreground mb-2">Welcome Back</h1>
+          <h1 className="text-3xl font-heading font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">Welcome Back</h1>
           <p className="text-muted-foreground">Sign in to access your academic dashboard</p>
         </motion.div>
 
@@ -74,7 +76,7 @@ export default function LoginPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="shadow-2xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+          <Card className="shadow-2xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
             <CardHeader>
               <CardTitle className="font-heading">Sign In</CardTitle>
               <CardDescription>Enter your credentials to access your account</CardDescription>

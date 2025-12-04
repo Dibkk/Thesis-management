@@ -22,6 +22,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, message: 'Invalid credentials' }, { status: 401 });
     }
 
+    // Update lastLogin
+    user.lastLogin = new Date();
+    await user.save();
+
     const token = jwt.sign(
       {
         id: user._id,

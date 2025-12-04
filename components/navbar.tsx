@@ -134,7 +134,7 @@ export default function Navbar() {
 
   return (
     <motion.nav
-      className="bg-card border-b border-border shadow-sm sticky top-0 z-50 backdrop-blur-sm"
+      className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-border/40 shadow-lg sticky top-0 z-50"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.3 }}
@@ -142,9 +142,11 @@ export default function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <span className="text-xl font-heading font-bold">Thesis Management</span>
+          <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg shadow-blue-500/30">
+              <BookOpen className="h-5 w-5 text-white" />
+            </div>
+            <span className="text-xl font-heading font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Thesis Management</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -154,13 +156,13 @@ export default function Navbar() {
                 const Icon = item.icon
                 const isActive = pathname === item.href
                 return (
-                  <motion.div key={item.href} whileHover={{ y: -1 }} whileTap={{ y: 0 }}>
+                  <motion.div key={item.href} whileHover={{ y: -1, scale: 1.02 }} whileTap={{ y: 0 }}>
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors duration-200 text-sm ${
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium ${
                         isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                          ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/30"
+                          : "text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20"
                       }`}
                     >
                       <Icon className="h-4 w-4" />
@@ -179,7 +181,7 @@ export default function Navbar() {
               variant="ghost"
               size="sm"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="hidden md:flex"
+              className="hidden md:flex hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10"
             >
               <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -200,9 +202,9 @@ export default function Navbar() {
                 {/* User Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-primary text-primary-foreground">
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:ring-2 hover:ring-blue-500/50 transition-all">
+                      <Avatar className="h-10 w-10 border-2 border-gradient-to-r from-blue-500 to-purple-600">
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold">
                           {/* --- ใช้ตัวแปร initials ที่ปลอดภัยแล้ว --- */}
                           {initials}
                         </AvatarFallback>

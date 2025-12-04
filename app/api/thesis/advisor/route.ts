@@ -22,16 +22,36 @@ export async function GET() {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
-    if (decoded.role !== 'advisor') {
-        return NextResponse.json({ success: false, error: 'Authorized for Advisor only' }, { status: 403 });
+    if (decoded.role !== 'advisor' && decoded.role !== 'admin') {
+        return NextResponse.json({ success: false, error: 'Authorized for Advisor or Admin' }, { status: 403 });
     }
 
     await connectDatabase();
-    const theses = await Thesis.find({ advisor: decoded.id })
-      .populate('author', 'firstName lastName email user_id department') 
-      .sort({ updatedAt: -1 });
+    
+    // Import Comment model dynamically or ensure it's imported at top
+    const { Comment } = await import('@/lib/models/comment');
 
-    return NextResponse.json({ success: true, theses });
+    let query = {};
+    if (decoded.role === 'advisor') {
+        query = { advisor: decoded.id };
+    }
+
+    const theses = await Thesis.find(query)
+      .populate('author', 'firstName lastName email user_id department') 
+      .sort({ updatedAt: -1 })
+      .lean(); // Use lean() to get plain JS objects
+
+    // Add unreadCommentsCount to each thesis
+    const thesesWithCounts = await Promise.all(theses.map(async (thesis: any) => {
+        const unreadCount = await Comment.countDocuments({
+            thesis: thesis._id,
+            user: { $ne: decoded.id }, // Comments NOT by the advisor
+            isRead: false
+        });
+        return { ...thesis, unreadCommentsCount: unreadCount };
+    }));
+
+    return NextResponse.json({ success: true, theses: thesesWithCounts });
 
   } catch (error: any) {
     console.error('API Advisor Thesis Error:', error);

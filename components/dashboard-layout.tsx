@@ -83,25 +83,26 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
 
     const roleSpecificItems = {
       student: [
+        { icon: Search, label: "Browse", href: "/dashboard/browse" },
         { icon: FileText, label: "My Thesis", href: "/dashboard/thesis" },
         { icon: Upload, label: "Upload", href: "/dashboard/upload" },
         // { icon: Clock, label: "Progress", href: "/dashboard/progress" },
-        { icon: Search, label: "Browse", href: "/dashboard/browse" },
-        // { icon: Bell, label: "Notifications", href: "/dashboard/notifications" },
+        { icon: Bell, label: "Notifications", href: "/dashboard/notifications" },
       ],
       advisor: [
+        { icon: Search, label: "Browse", href: "/dashboard/browse" },
         { icon: Users, label: "Students", href: "/dashboard/students" },
         { icon: FileText, label: "Reviews", href: "/dashboard/reviews" },
         { icon: CheckCircle, label: "Approvals", href: "/dashboard/approvals" },
+        { icon: MessageSquare, label: "Reports", href: "/dashboard/reports" },
         // { icon: BarChart3, label: "Analytics", href: "/dashboard/analytics" },
-        { icon: Search, label: "Browse", href: "/dashboard/browse" },
         { icon: Bell, label: "Notifications", href: "/dashboard/notifications" },
       ],
       admin: [
         { icon: Users, label: "User Management", href: "/dashboard/users" },
         { icon: FileText, label: "All Theses", href: "/dashboard/theses" },
         { icon: CheckCircle, label: "Approvals", href: "/dashboard/approvals" },
-        { icon: BarChart3, label: "Analytics", href: "/dashboard/analytics" },
+        // { icon: BarChart3, label: "Analytics", href: "/dashboard/analytics" },
         { icon: MessageSquare, label: "Reports", href: "/dashboard/reports" },
         { icon: Settings, label: "System Settings", href: "/dashboard/settings" },
         { icon: Search, label: "Browse", href: "/dashboard/browse" },
@@ -122,30 +123,37 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
       transition={{ duration: 0.3 }}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center border-b border-sidebar-border px-6">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-            <BookOpen className="h-6 w-6 text-sidebar-primary" />
+      <div className="flex h-16 items-center border-b border-white/10 px-6 bg-gradient-to-r from-blue-500/5 to-purple-500/5">
+        <Link href="/dashboard" className="flex items-center gap-3">
+          <motion.div 
+            className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg shadow-blue-500/30"
+            whileHover={{ scale: 1.05, rotate: 5 }} 
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+          >
+            <BookOpen className="h-5 w-5 text-white" />
           </motion.div>
-          <span className="font-heading font-bold text-sidebar-foreground">Thesis Manager</span>
+          <span className="font-heading font-bold text-lg bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Thesis Manager</span>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 p-4">
+      <nav className="flex-1 space-y-2 p-4">
         {navigationItems.map((item, index) => (
           <motion.div
             key={item.href}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
+            whileHover={{ x: 4 }}
           >
             <Link
               href={item.href}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1"
+              className="group flex items-center gap-3 rounded-xl px-4 py-3 text-sidebar-foreground/80 transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10 hover:text-foreground hover:shadow-lg hover:shadow-blue-500/5 backdrop-blur-sm border border-transparent hover:border-blue-500/20"
             >
-              <item.icon className="h-4 w-4" />
-              {item.label}
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-500/10 to-purple-500/10 group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-all">
+                <item.icon className="h-4 w-4" />
+              </div>
+              <span className="font-medium">{item.label}</span>
             </Link>
           </motion.div>
         ))}
@@ -153,16 +161,16 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
 
       {/* User Role Badge */}
       <motion.div
-        className="border-t border-sidebar-border p-4"
+        className="border-t border-white/10 p-4 bg-gradient-to-r from-blue-500/5 to-purple-500/5"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.3, delay: 0.5 }}
+        transition={{ duration: 0.3, delay: 0.3 }}
       >
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="capitalize">
+          <Badge variant="outline" className="capitalize bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-blue-500/30 text-foreground font-semibold">
             {user?.role ?? "guest"}
           </Badge>
-          <span className="text-xs text-sidebar-foreground/70">{user?.department ?? ""}</span>
+          <span className="text-xs text-sidebar-foreground/70 font-medium">{user?.department ?? ""}</span>
         </div>
       </motion.div>
     </motion.div>
@@ -171,13 +179,13 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
   return (
     <div className="flex h-screen bg-background">
       {/* Desktop Sidebar */}
-      <aside className="hidden w-64 border-r border-sidebar-border bg-sidebar lg:block">
+      <aside className="hidden w-64 border-r border-border/40 bg-gradient-to-b from-slate-50 to-blue-50/30 dark:from-gray-900 dark:to-blue-950/20 backdrop-blur-xl lg:block shadow-xl">
         <SidebarContent />
       </aside>
 
       {/* Mobile Sidebar */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-        <SheetContent side="left" className="w-64 p-0 bg-sidebar">
+        <SheetContent side="left" className="w-64 p-0 bg-gradient-to-b from-slate-50 to-blue-50/30 dark:from-gray-900 dark:to-blue-950/20 backdrop-blur-xl">
           <SidebarContent />
         </SheetContent>
       </Sheet>
@@ -186,7 +194,7 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top Header */}
         <motion.header
-          className="flex h-16 items-center justify-between border-b border-border bg-card px-6"
+          className="flex h-16 items-center justify-between border-b border-border/40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl px-6 shadow-sm"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.3 }}
@@ -195,13 +203,16 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
             {/* Mobile Menu Button */}
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="lg:hidden">
+                <Button variant="ghost" size="sm" className="lg:hidden hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
             </Sheet>
 
-            <h2 className="font-heading font-semibold text-card-foreground">Welcome back, {displayName}</h2>
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-1 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
+              <h2 className="font-heading font-semibold text-card-foreground bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Welcome back, {displayName}</h2>
+            </div>
           </div>
 
           <div className="flex items-center gap-4">
@@ -213,6 +224,7 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
               variant="ghost"
               size="sm"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10"
             >
               <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -221,10 +233,11 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" alt={displayName} />
-                    <AvatarFallback>{initials}</AvatarFallback>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:ring-2 hover:ring-blue-500/50 transition-all">
+                  <Avatar className="h-10 w-10 border-2 border-gradient-to-r from-blue-500 to-purple-600">
+                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold text-sm">
+                      {initials}
+                    </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
