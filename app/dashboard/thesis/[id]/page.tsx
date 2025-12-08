@@ -502,7 +502,7 @@ export default function ThesisDetailPage() {
                   <ArrowLeft className="mr-2 h-4 w-4" /> Back
               </Button>
 
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground font-medium flex items-center gap-1">
                       <History className="h-4 w-4" /> Version History:
                   </span>
@@ -519,7 +519,7 @@ export default function ThesisDetailPage() {
                           ))}
                       </SelectContent>
                   </Select>
-              </div>
+              </div> */}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mx-auto">
