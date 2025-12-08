@@ -413,13 +413,15 @@ export default function DashboardPage() {
                     </div>
                   </SelectTrigger>
                   <SelectContent align="end" className="w-[300px]">
-                     {theses.map((thesis) => (
+                     {theses
+                        .filter((thesis) => thesis.author === user.id)
+                        .map((thesis) => (
                         <SelectItem key={thesis._id} value={thesis._id} className="py-3 cursor-pointer">
                            <div className="flex flex-col gap-1">
                               <span className="font-medium truncate">{thesis.title}</span>
                               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                  <span className="bg-muted px-1.5 py-0.5 rounded">{thesis.thesis_id}</span>
-                                 <span>v{thesis.thesis_id.split('-')[1] || '1'}</span>
+                                 {/* <span>v{thesis.thesis_id.split('-')[1] || '1'}</span> */}
                               </div>
                            </div>
                         </SelectItem>
