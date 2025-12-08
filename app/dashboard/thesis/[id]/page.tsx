@@ -173,6 +173,25 @@ export default function ThesisDetailPage() {
 
   const router = useRouter();
 
+  // Tab State
+  const [activeTab, setActiveTab] = useState("overview");
+
+  // Check hash for deep linking
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const hash = window.location.hash.replace('#', '');
+        if (hash && ['overview', 'timeline', 'meetings', 'feedback'].includes(hash)) {
+            setActiveTab(hash);
+        }
+    }
+  }, []);
+
+  // Update hash when tab changes
+  const handleTabChange = (value: string) => {
+      setActiveTab(value);
+      window.location.hash = value;
+  }
+
   // 1. Fetch Data
   useEffect(() => {
     if (!id) return;
@@ -525,7 +544,7 @@ export default function ThesisDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mx-auto">
 
               <div className="lg:col-span-2 space-y-6">
-                  <Tabs defaultValue="overview" className="w-full">
+                  <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                       <TabsList className="grid w-full grid-cols-4 mb-4 h-11 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border border-border/40 shadow-lg">
                           <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 font-medium py-2.5">Overview</TabsTrigger>
                           <TabsTrigger value="timeline" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 font-medium py-2.5">Timeline</TabsTrigger>

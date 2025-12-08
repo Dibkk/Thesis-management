@@ -318,6 +318,22 @@ function UploadPageContent() {
   }
 
   // (โค้ด Variants เหมือนเดิม)
+  // Handle Tab Change with Hash Update
+  const handleTabChange = (value: "new" | "update") => {
+      setUploadMode(value);
+      window.location.hash = value;
+  };
+
+  // Check hash for deep linking
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const hash = window.location.hash.replace('#', '');
+        if (hash === 'update' || hash === 'new') {
+            setUploadMode(hash);
+        }
+    }
+  }, []);
+
   const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1, }, }, };
   const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 }, };
 
@@ -328,6 +344,8 @@ function UploadPageContent() {
       </div>
     )
   }
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 p-6">
@@ -348,7 +366,7 @@ function UploadPageContent() {
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Tabs defaultValue="new" className="mb-6" onValueChange={(v) => setUploadMode(v as "new" | "update")}>
+          <Tabs value={uploadMode} className="mb-6" onValueChange={(v) => handleTabChange(v as "new" | "update")}>
             <TabsList className="grid w-full grid-cols-2 h-11 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 shadow-lg rounded-xl">
               <TabsTrigger 
                 value="new" 
