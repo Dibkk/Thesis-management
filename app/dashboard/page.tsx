@@ -263,7 +263,7 @@ export default function DashboardPage() {
         <>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-300" asChild>
-              <Link href="/dashboard/upload#new">
+              <Link href="/dashboard/upload">
                 <UploadCloud className="h-4 w-4" /> Upload New Version
               </Link>
             </Button>
@@ -414,7 +414,7 @@ export default function DashboardPage() {
                   </SelectTrigger>
                   <SelectContent align="end" className="w-[300px]">
                      {theses
-                        // .filter((thesis) => thesis.author?.user_id === user.user_id) // Removed redundant filter
+                        .filter((thesis) => thesis.author === user.id)
                         .map((thesis) => (
                         <SelectItem key={thesis._id} value={thesis._id} className="py-3 cursor-pointer">
                            <div className="flex flex-col gap-1">
@@ -485,7 +485,7 @@ export default function DashboardPage() {
                   </div>
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-300" asChild>
-                        <Link href="/dashboard/upload#update">
+                        <Link href="/dashboard/upload">
                           <UploadCloud className="h-4 w-4" /> Upload New Chapter
                         </Link>
                       </Button>
