@@ -258,10 +258,6 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
                   </Link>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem>
-                  <Shield className="mr-2 h-4 w-4" />
-                  <span>Admin Panel</span>
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 
                 {/* 2. --- onSelect={handleLogout} ถูกต้องแล้ว --- */}

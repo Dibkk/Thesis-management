@@ -263,7 +263,7 @@ export default function DashboardPage() {
         <>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-300" asChild>
-              <Link href="/dashboard/upload#update">
+              <Link href="/dashboard/upload">
                 <UploadCloud className="h-4 w-4" /> Upload New Version
               </Link>
             </Button>
@@ -413,13 +413,15 @@ export default function DashboardPage() {
                     </div>
                   </SelectTrigger>
                   <SelectContent align="end" className="w-[300px]">
-                     {theses.map((thesis) => (
+                     {theses
+                        .filter((thesis) => thesis.author === user.id)
+                        .map((thesis) => (
                         <SelectItem key={thesis._id} value={thesis._id} className="py-3 cursor-pointer">
                            <div className="flex flex-col gap-1">
                               <span className="font-medium truncate">{thesis.title}</span>
                               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                  <span className="bg-muted px-1.5 py-0.5 rounded">{thesis.thesis_id}</span>
-                                 <span>v{thesis.thesis_id.split('-')[1] || '1'}</span>
+                                 {/* <span>v{thesis.thesis_id.split('-')[1] || '1'}</span> */}
                               </div>
                            </div>
                         </SelectItem>
@@ -472,11 +474,22 @@ export default function DashboardPage() {
            {/* Chart Section */}
            <Card className="rounded-2xl border-0 shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
              <CardHeader>
-               <CardTitle className="font-heading flex items-center gap-2">
-                 <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg shadow-md">
-                   <FileText className="h-5 w-5 text-white" />
-                 </div>
-                 Chapter Progress
+               <CardTitle className="font-heading flex items-center gap-2 justify-between">
+                  <div className="flex col-auto items-center">
+                      <div className="p-2 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg shadow-md">
+                        <FileText className="h-5 w-5 text-white" />
+                      </div>
+                      <div className="px-2">
+                        Chapter Progress
+                      </div>
+                  </div>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-300" asChild>
+                        <Link href="/dashboard/upload">
+                          <UploadCloud className="h-4 w-4" /> Upload New Chapter
+                        </Link>
+                      </Button>
+                    </motion.div>
                </CardTitle>
                <CardDescription>Visual breakdown of your thesis chapters</CardDescription>
              </CardHeader>
