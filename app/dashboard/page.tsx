@@ -845,7 +845,7 @@ export default function DashboardPage() {
                         onUserAdded={() => window.location.reload()}
                     />
                     <Button variant="secondary" className="w-full justify-start bg-white/10 hover:bg-white/20 text-white border-0" asChild>
-                       <Link href="/dashboard/approvals"><CheckCircle className="mr-2 h-4 w-4" /> Review Pending Items</Link>
+                       <Link href="/dashboard/reviews"><CheckCircle className="mr-2 h-4 w-4" /> Review Pending Items</Link>
                     </Button>
                     <Button variant="secondary" className="w-full justify-start bg-white/10 hover:bg-white/20 text-white border-0" asChild>
                        <Link href="/dashboard/settings"><Settings className="mr-2 h-4 w-4" /> System Configuration</Link>
