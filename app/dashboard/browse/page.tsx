@@ -578,7 +578,8 @@ export default function BrowsePage() {
               <AnimatePresence mode="popLayout">
                 {currentItems.length > 0 ? (
                   viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    // <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div className="flex flex-row flex-wrap justify-start gap-6">
                       {currentItems.map((thesis, index) => (
                         <motion.div 
                           key={thesis._id} 
@@ -588,8 +589,10 @@ export default function BrowsePage() {
                           exit={{ opacity: 0 }}
                           transition={{ delay: index * 0.05 }}
                           whileHover={{ y: -4 }}
+                          className="w-fit"
+                          hidden={ !thesis.isPublic }
                         >
-                          <Card className="group relative overflow-hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-0 shadow-lg hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
+                          <Card className="group relative overflow-hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-0 shadow-lg hover:shadow-2xl transition-all duration-500 h-full w-fit flex flex-col">
                             {/* Gradient overlay on hover */}
                             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             
