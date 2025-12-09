@@ -45,7 +45,7 @@ export function GlobalSearch() {
       clearTimeout(searchTimeout.current)
     }
 
-    if (searchQuery.length > 2) {
+    if (searchQuery.length > 0) {
       searchTimeout.current = setTimeout(async () => {
         try {
           const res = await fetch('/api/query/thesis') // เรียกข้อมูลทั้งหมดมา (ใน production ควรมี API search โดยเฉพาะ)
