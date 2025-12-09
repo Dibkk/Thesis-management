@@ -58,6 +58,7 @@ export default function BrowsePage() {
   const [theses, setTheses] = useState<IThesis[]>([]) 
   const [filteredTheses, setFilteredTheses] = useState<IThesis[]>([])
   const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<any>(null);
 
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState("relevance")
@@ -76,6 +77,16 @@ export default function BrowsePage() {
 
   useEffect(() => {
     async function fetchData() {
+      const storedUser = localStorage.getItem("user");
+      
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (err) {
+          console.error("Invalid user in localStorage", err);
+        }
+      }
+      
       try {
         const res = await fetch('/api/query/thesis');
         const data = await res.json();
@@ -252,7 +263,7 @@ export default function BrowsePage() {
                 </div>
                 <p className="text-muted-foreground text-lg">Discover and explore academic research from our repository</p>
               </div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} hidden={ !(user.role == 'advisor') }>
                 <Button variant="outline" onClick={handleExportCSV} className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-purple-50 dark:hover:bg-purple-900/20 border-purple-200 dark:border-purple-800 transition-all duration-300">
                   <Download className="mr-2 h-4 w-4" /> Export CSV
                 </Button>
@@ -283,6 +294,7 @@ export default function BrowsePage() {
                  animate={{ opacity: 1, y: 0 }}
                  transition={{ delay: index * 0.1 }}
                  whileHover={{ y: -4, scale: 1.01 }}
+                 hidden={ !thesis.isPublic }
                >
                  <Card className="group relative overflow-hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-0 shadow-xl hover:shadow-2xl transition-all duration-500 h-full">
                    {/* Gradient overlay on hover */}
