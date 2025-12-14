@@ -78,17 +78,18 @@ export default function BrowsePage() {
   useEffect(() => {
     async function fetchData() {
       const storedUser = localStorage.getItem("user");
-      
+      let obj;
       if (storedUser) {
         try {
-          setUser(JSON.parse(storedUser));
+          obj = JSON.parse(storedUser);
+          setUser(obj);
         } catch (err) {
           console.error("Invalid user in localStorage", err);
         }
       }
       
       try {
-        const res = await fetch('/api/query/thesis');
+        const res = obj.role == "advisor" ? await fetch('/api/query/thesis') : await fetch('/api/query/thesisPub');
         const data = await res.json();
         if (data.success) {
           setTheses(data.theses);
@@ -192,8 +193,8 @@ export default function BrowsePage() {
 
   // Pagination Logic
   const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredTheses.slice(indexOfFirstItem, indexOfLastItem);
+  const indexOfFirstItem = theses.length > 0 ? 0 : indexOfLastItem - itemsPerPage;
+  const currentItems = filteredTheses.slice(indexOfFirstItem - 1, indexOfLastItem);
   const totalPages = Math.ceil(filteredTheses.length / itemsPerPage);
 
   const handlePageChange = (pageNumber: number) => {
@@ -294,7 +295,7 @@ export default function BrowsePage() {
                  animate={{ opacity: 1, y: 0 }}
                  transition={{ delay: index * 0.1 }}
                  whileHover={{ y: -4, scale: 1.01 }}
-                 hidden={ !thesis.isPublic }
+                 hidden={ !(thesis.isPublic || user.role == 'advisor') }
                >
                  <Card className="group relative overflow-hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-0 shadow-xl hover:shadow-2xl transition-all duration-500 h-full">
                    {/* Gradient overlay on hover */}
@@ -537,7 +538,7 @@ export default function BrowsePage() {
               className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 p-4 rounded-xl shadow-lg"
             >
               <p className="text-sm text-muted-foreground font-medium flex items-center gap-2">
-                Showing <span className="px-2 py-0.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-md text-xs">{indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredTheses.length)}</span> of <span className="px-2 py-0.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-md text-xs">{filteredTheses.length}</span> results
+                Showing <span className="px-2 py-0.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-md text-xs">{indexOfFirstItem}-{Math.min(indexOfLastItem, filteredTheses.length)}</span> of <span className="px-2 py-0.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-md text-xs">{filteredTheses.length}</span> results
               </p>
               
               <div className="flex items-center gap-3">
@@ -602,7 +603,7 @@ export default function BrowsePage() {
                           transition={{ delay: index * 0.05 }}
                           whileHover={{ y: -4 }}
                           className="w-fit"
-                          hidden={ !thesis.isPublic }
+                          hidden={ !(thesis.isPublic || user.role == 'advisor') }
                         >
                           <Card className="group relative overflow-hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-0 shadow-lg hover:shadow-2xl transition-all duration-500 h-full w-fit flex flex-col">
                             {/* Gradient overlay on hover */}
