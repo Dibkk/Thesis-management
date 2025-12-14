@@ -193,7 +193,7 @@ export default function BrowsePage() {
 
   // Pagination Logic
   const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = theses.length > 0 ? 0 : indexOfLastItem - itemsPerPage;
+  const indexOfFirstItem = theses.length > 0 ? indexOfLastItem - itemsPerPage + 1 : 0;
   const currentItems = filteredTheses.slice(indexOfFirstItem - 1, indexOfLastItem);
   const totalPages = Math.ceil(filteredTheses.length / itemsPerPage);
 
