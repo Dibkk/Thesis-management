@@ -156,7 +156,7 @@ export default function PublicThesisViewPage() {
         <div className="flex-1 bg-slate-100 p-4 overflow-hidden flex flex-col items-center justify-center">
             {thesis.file_path ? (
                 <iframe 
-                    src={`/api/thesis/${id}/file#toolbar=0`} 
+                    src={`/api/thesis/${id}/file#toolbar=1`} 
                     className="w-full h-full rounded-lg shadow-lg border bg-white"
                     title="Thesis PDF"
                 />
