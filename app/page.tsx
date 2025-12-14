@@ -40,11 +40,11 @@ export default function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="text-lg px-8 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-xl shadow-blue-500/30">
-              <Link href="/register">Get Started</Link>
+              <Link href="/browse">Get Started</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="text-lg px-8 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20">
+            {/* <Button asChild variant="outline" size="lg" className="text-lg px-8 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-blue-900/20 dark:hover:to-purple-900/20">
               <Link href="/login">Sign In</Link>
-            </Button>
+            </Button> */}
           </div>
         </div>
       </section>

@@ -18,6 +18,8 @@ export async function middleware(request: NextRequest) {
       console.error('Middleware Auth Error:', error)
       return NextResponse.redirect(new URL('/login', request.url))
     }
+  } else if(request.nextUrl.pathname.startsWith('/dashboard')){
+
   }
 
   return NextResponse.next()
