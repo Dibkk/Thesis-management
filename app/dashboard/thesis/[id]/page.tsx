@@ -261,21 +261,28 @@ export default function ThesisDetailPage() {
   const handleSaveScore = async () => {
       setIsSavingScore(true);
       try {
-          const res = await fetch(`/api/thesis/${id}/review`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ similarityScore: Number(similarityScore) })
-          });
-          const data = await res.json();
-          if (data.success) {
-              // Update local thesis state to match
-              setThesis(prev => prev ? { ...prev, similarityScore: Number(similarityScore) } : null);
-              
-              // Refresh timeline
-              const resTimeline = await fetch(`/api/thesis/${id}/timeline`);
-              const dataTimeline = await resTimeline.json();
-              if (dataTimeline.success) setTimeline(dataTimeline.timeline);
+          if (similarityScore as number < 0) {
+              setSimilarityScore(0);
+          } else if (similarityScore as number > 100) {
+              setSimilarityScore(100);
+          } else {
+            const res = await fetch(`/api/thesis/${id}/review`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ similarityScore: Number(similarityScore) })
+            });
+            const data = await res.json();
+            if (data.success) {
+                // Update local thesis state to match
+                setThesis(prev => prev ? { ...prev, similarityScore: Number(similarityScore) } : null);
+                
+                // Refresh timeline
+                const resTimeline = await fetch(`/api/thesis/${id}/timeline`);
+                const dataTimeline = await resTimeline.json();
+                if (dataTimeline.success) setTimeline(dataTimeline.timeline);
+            }
           }
+
       } catch (error) {
           console.error("Failed to save score:", error);
       } finally {
@@ -672,20 +679,22 @@ export default function ThesisDetailPage() {
                                   <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
                                       <CardHeader>
                                           <CardTitle className="flex items-center gap-2 text-base">
-                                              <Percent className="h-4 w-4 text-orange-500" /> Similarity Score
+                                              <Percent className="h-4 w-4 text-orange-500" /> Score
                                           </CardTitle>
                                       </CardHeader>
                                       <CardContent className="flex flex-col gap-4">
                                           <div className="flex items-center justify-between">
                                               <div className="flex flex-col">
                                                   <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Current Score</span>
-                                                  <div className={`text-4xl font-bold ${getScoreColor(thesis?.similarityScore || 0)}`}>
-                                                      {thesis?.similarityScore ?? 0}%
+                                                  {/* <div className={`text-4xl font-bold ${getScoreColor(thesis?.similarityScore || 0)}`}> */}
+                                                  <div className={`text-4xl font-bold }`}>
+                                                      {thesis?.similarityScore ?? 0} point
                                                   </div>
                                               </div>
-                                              <div className={`px-3 py-1 rounded-full text-xs font-medium ${getScoreBg(thesis?.similarityScore || 0)} ${getScoreColor(thesis?.similarityScore || 0)}`}>
+                                              <div></div>
+                                              {/* <div className={`px-3 py-1 rounded-full text-xs font-medium ${getScoreBg(thesis?.similarityScore || 0)} ${getScoreColor(thesis?.similarityScore || 0)}`}>
                                                   {(thesis?.similarityScore || 0) < 20 ? "Low Risk" : (thesis?.similarityScore || 0) < 50 ? "Moderate" : "High Risk"}
-                                              </div>
+                                              </div> */}
                                           </div>
                                           <Separator />
                                           <div className="space-y-2">
@@ -693,10 +702,12 @@ export default function ThesisDetailPage() {
                                               <div className="flex items-center gap-2">
                                                   <Input 
                                                       type="number" 
-                                                      placeholder="Enter %" 
+                                                      placeholder="Enter Score" 
                                                       value={similarityScore} 
                                                       onChange={(e) => setSimilarityScore(e.target.value)}
                                                       className="flex-1"
+                                                      max={"100"}
+                                                      min={"0"}
                                                   />
                                                   <Button size="sm" onClick={handleSaveScore} disabled={isSavingScore}>
                                                       {isSavingScore ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
