@@ -41,7 +41,8 @@ export async function GET() {
         email: user.email,
         role: user.role,
         department: user.department,
-        user_id: user.user_id 
+        user_id: user.user_id,
+        lineId: user.lineId
       },
     });
 

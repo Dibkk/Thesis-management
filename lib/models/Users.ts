@@ -10,6 +10,7 @@ interface IUser extends Document {
   lastName: string;
   bio: string;
   lastLogin?: Date;
+  lineId?: string;
 }
 
 const userSchema = new Schema<IUser>({
@@ -22,6 +23,7 @@ const userSchema = new Schema<IUser>({
   lastName: { type: String, required: true },
   bio: { type: String },
   lastLogin: { type: Date },
+  lineId: { type: String },
 });
 
 export const User = mongoose.models.User || mongoose.model('User', userSchema)

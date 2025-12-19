@@ -323,7 +323,7 @@ export default function MyThesisPage() {
                           size="sm"
                           onClick={() => handleDelete(thesis._id)}
                           disabled={deletingId === thesis._id}
-                          className="bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 text-red-600 dark:text-red-400 hover:from-red-100 hover:to-rose-100 dark:hover:from-red-900/30 dark:hover:to-rose-900/30 border border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700 shadow-sm hover:shadow-md transition-all duration-300"
+                          className="bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-700/90 dark:to-red-700/90 text-red-600 dark:text-white hover:from-red-100 hover:to-rose-100 dark:hover:from-red-700 dark:hover:to-red-700 border border-red-200 dark:border-red-600 hover:border-red-300 dark:hover:border-red-500 shadow-sm hover:shadow-md transition-all duration-300 font-medium"
                         >
                           {deletingId === thesis._id ? (
                             <span className="animate-spin mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
@@ -391,7 +391,7 @@ export default function MyThesisPage() {
                       
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <Button variant="outline" size="sm" asChild className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm hover:bg-green-50 dark:hover:bg-green-900/20 border-green-200 dark:border-green-800 hover:border-green-300 dark:hover:border-green-700 transition-all duration-300">
-                          <a href={thesis.file_path} download>
+                          <a href={`/api/thesis/${thesis._id}/file`} download>
                             <Download className="h-4 w-4 mr-2" />
                             Download PDF
                           </a>

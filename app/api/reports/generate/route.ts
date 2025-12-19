@@ -189,7 +189,6 @@ export async function POST(req: Request) {
        }));
 
     } else if (template.id === 'at-risk-students') {
-       // Find theses not updated in 30 days and not completed
        const thirtyDaysAgo = new Date();
        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -199,8 +198,6 @@ export async function POST(req: Request) {
        };
        
        if (dateRange?.from && dateRange?.to) {
-           // If date range is provided, maybe filter by creation date or last update within that range?
-           // Usually "at risk" implies current state, so date range might be less relevant, but let's respect it if given for "last update"
            query.updatedAt = { 
                $lt: thirtyDaysAgo,
                $gte: new Date(dateRange.from), 

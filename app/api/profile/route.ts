@@ -83,6 +83,7 @@ export async function GET(req: Request) {
         department: user.department,
         user_id: user.user_id,
         bio: user.bio,
+        lineId: user.lineId,
       },
       stats
     });
@@ -111,7 +112,8 @@ export async function PUT(req: Request) {
     
    
     const body = await req.json();
-    const { firstname, lastname, email, department, user_id, bio } = body;
+    console.log("Profile update body:", body);
+    const { firstname, lastname, email, department, user_id, bio, lineId } = body;
 
     
     const updatedUser = await User.findByIdAndUpdate(
@@ -122,7 +124,8 @@ export async function PUT(req: Request) {
         email: email,
         department: department,
         user_id: user_id, 
-        bio: bio
+        bio: bio,
+        lineId: lineId
       },
       { new: true } 
     );
@@ -141,7 +144,9 @@ export async function PUT(req: Request) {
         email: updatedUser.email,
         role: updatedUser.role,
         department: updatedUser.department,
-        user_id: updatedUser.user_id
+        user_id: updatedUser.user_id,
+        bio: updatedUser.bio,
+        lineId: updatedUser.lineId
       },
     });
 

@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { GlobalSearch } from "@/components/global-search"
 import { NotificationBell } from "@/components/notification-bell"
@@ -186,6 +186,7 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
       {/* Mobile Sidebar */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent side="left" className="w-64 p-0 bg-gradient-to-b from-slate-50 to-blue-50/30 dark:from-gray-900 dark:to-blue-950/20 backdrop-blur-xl">
+          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
           <SidebarContent />
         </SheetContent>
       </Sheet>
@@ -201,13 +202,14 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
         >
           <div className="flex items-center gap-4">
             {/* Mobile Menu Button */}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="lg:hidden hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-            </Sheet>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="lg:hidden hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
 
             <div className="flex items-center gap-2">
               <div className="h-8 w-1 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>

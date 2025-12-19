@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import Navbar from "@/components/navbar"
-import { User, Mail, Shield, Calendar, Edit, Save, X, Loader2 } from "lucide-react" 
+import { User, Mail, Shield, Calendar, Edit, Save, X, Loader2, MessageSquare } from "lucide-react" 
 import { AnimatePresence} from "framer-motion"
 import { AlertCircle } from "lucide-react"
 
@@ -25,6 +25,7 @@ interface UserProfile {
   studentId?: string; 
   user_id?: string;  
   bio?: string;
+  lineId?: string;
   stats?: {
     stat1: number;
     stat2: number;
@@ -59,6 +60,7 @@ export default function ProfilePage() {
             joinDate: "January 2024", 
             studentId: data.user.user_id, 
             bio: data.user.bio || "",
+            lineId: data.user.lineId,
             stats: data.stats // Add stats
           }
           setUser(fullUser);
@@ -270,6 +272,12 @@ export default function ProfilePage() {
                       <span>ID: {user.studentId}</span>
                     </div>
                   )}
+                  {user.lineId && (
+                    <div className="flex items-center justify-center gap-2">
+                       <MessageSquare className="h-4 w-4" />
+                       <span>Line ID: {user.lineId}</span>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -422,13 +430,36 @@ export default function ProfilePage() {
                     </div>
                   )}
 
-                  {/* <div className="space-y-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="lineId">Line ID</Label>
+                    {isEditing ? (
+                      <motion.div
+                        whileFocus={{ boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)" }}
+                        transition={{ duration: 0.2 }}
+                      >
+                         <Input
+                          id="lineId"
+                          value={editForm.lineId || ""}
+                          onChange={(e) => setEditForm({ ...editForm, lineId: e.target.value })}
+                          className="focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
+                          placeholder="Enter your Line ID"
+                        />
+                      </motion.div>
+                    ) : (
+                      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                        <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                        <span>{user.lineId || "Not specified"}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="joinDate">Join Date</Label>
                     <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       <span>{user.joinDate}</span>
                     </div>
-                  </div> */}
+                  </div>
                 </div>
               </CardContent>
             </Card>

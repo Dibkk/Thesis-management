@@ -13,6 +13,8 @@ import Link from "next/link"
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, Legend } from 'recharts';
 import { LoadingScreen } from "@/components/loading"
 import { AddUserDialog } from "@/components/add-user-dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Copy } from "lucide-react"
 
 interface User {
   id: string
@@ -44,6 +46,8 @@ interface IThesis {
     _id: string;
     firstName: string;
     lastName: string;
+    email?: string;
+    lineId?: string;
   };
   chapterApproval?: {
     chapter1: boolean;
@@ -276,9 +280,88 @@ export default function DashboardPage() {
             </Button>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-orange-50 dark:hover:bg-orange-900/20 border-orange-200 dark:border-orange-800 hover:border-orange-300 dark:hover:border-orange-700 text-orange-700 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-200 transition-all duration-300">
-               <Mail className="h-4 w-4" /> Contact Advisor
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-orange-50 dark:hover:bg-orange-900/20 border-orange-200 dark:border-orange-800 hover:border-orange-300 dark:hover:border-orange-700 text-orange-700 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-200 transition-all duration-300">
+                  <Mail className="h-4 w-4" /> Contact Advisor
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md p-0 overflow-hidden bg-white dark:bg-gray-900 border-0 shadow-2xl">
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-bold text-white">Advisor Contact</DialogTitle>
+                      <p className="text-blue-100 mt-1 text-sm">Get in touch with your advisor</p>
+                    </DialogHeader>
+                </div>
+                
+                <div className="p-6 space-y-4">
+                  {activeThesis?.advisor ? (
+                     <>
+                      {/* Name */}
+                      <div className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
+                          <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                              <Users className="h-6 w-6" />
+                          </div>
+                          <div>
+                               <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-0.5">Advisor Name</p>
+                               <p className="font-bold text-gray-900 dark:text-gray-100 text-lg">{activeThesis.advisor.firstName} {activeThesis.advisor.lastName}</p>
+                          </div>
+                      </div>
+
+                      {/* Email */}
+                      <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 group">
+                          <div className="flex items-center gap-4 overflow-hidden">
+                              <div className="h-12 w-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 shrink-0">
+                                  <Mail className="h-6 w-6" />
+                              </div>
+                              <div className="overflow-hidden">
+                                   <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-0.5">Email Address</p>
+                                   <p className="font-semibold text-gray-900 dark:text-gray-100 truncate">{activeThesis.advisor.email || "N/A"}</p>
+                              </div>
+                          </div>
+                          {activeThesis.advisor.email && (
+                             <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20" 
+                              onClick={() => navigator.clipboard.writeText(activeThesis.advisor.email!)}
+                            >
+                               <Copy className="h-4 w-4" />
+                             </Button>
+                           )}
+                      </div>
+
+                      {/* Line ID */}
+                      <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 group">
+                          <div className="flex items-center gap-4 overflow-hidden">
+                              <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 shrink-0">
+                                  <MessageSquare className="h-6 w-6" />
+                              </div>
+                              <div className="overflow-hidden">
+                                   <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-0.5">Line ID</p>
+                                   <p className="font-semibold text-gray-900 dark:text-gray-100 truncate">{activeThesis.advisor.lineId || "Not provided"}</p>
+                              </div>
+                          </div>
+                           {activeThesis.advisor.lineId && (
+                             <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20" 
+                              onClick={() => navigator.clipboard.writeText(activeThesis.advisor.lineId!)}
+                            >
+                               <Copy className="h-4 w-4" />
+                             </Button>
+                           )}
+                      </div>
+                     </>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      No advisor assigned or thesis selected.
+                    </div>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
           </motion.div>
         </>
       ) : (
@@ -414,7 +497,10 @@ export default function DashboardPage() {
                   </SelectTrigger>
                   <SelectContent align="end" className="w-[300px]">
                      {theses
-                        .filter((thesis) => thesis.author === user.id)
+                        .filter((thesis) => {
+                           const authorId = typeof thesis.author === 'string' ? thesis.author : thesis.author?.user_id;
+                           return authorId === user.id;
+                        })
                         .map((thesis) => (
                         <SelectItem key={thesis._id} value={thesis._id} className="py-3 cursor-pointer">
                            <div className="flex flex-col gap-1">

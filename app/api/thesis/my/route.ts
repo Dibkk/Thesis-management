@@ -25,7 +25,7 @@ export async function GET() {
     await connectDatabase();
 
     const allTheses = await Thesis.find({ author: userId })
-      .populate('advisor', 'firstName lastName')
+      .populate('advisor', 'firstName lastName email lineId')
       .sort({ createdAt: -1 });
 
     // Filter เอาเฉพาะ Version ล่าสุดของแต่ละ thesis_id

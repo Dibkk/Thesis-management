@@ -591,8 +591,8 @@ export default function BrowsePage() {
               <AnimatePresence mode="popLayout">
                 {currentItems.length > 0 ? (
                   viewMode === 'grid' ? (
-                    // <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <div className="flex flex-row flex-wrap justify-start gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {/* <div className="flex flex-row flex-wrap justify-start gap-6"> */}
                       {currentItems.map((thesis, index) => (
                         <motion.div 
                           key={thesis._id} 
