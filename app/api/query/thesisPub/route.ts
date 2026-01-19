@@ -1,24 +1,57 @@
 // app/api/query/thesis/route.ts
+<<<<<<< HEAD
+import { NextResponse } from "next/server";
+import { connectDatabase } from "@/lib/databaseconnect";
+import { Thesis } from "@/lib/models/Thesis";
+import { User } from "@/lib/models/Users";
+=======
 import { NextResponse } from 'next/server';
 import { connectDatabase } from '@/lib/databaseconnect';
+<<<<<<< HEAD
 import { Thesis } from '@/lib/models/Thesis';
 import { User } from '@/lib/models/Users';
+=======
+// We'll dynamically import models after connecting to ensure their schemas
+// are registered on the active mongoose instance used by `connectDatabase()`.
+>>>>>>> cfe90daa1880b2eccd992a5de8be2d5fecf36ca7
+>>>>>>> f26a0e447824de8a637212eaa3a0cd7f5dd9a8b3
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
     await connectDatabase();
 
+<<<<<<< HEAD
     const Theses = await Thesis.find({ status: 'approved', isPublic:'true' })
       .populate('author', 'firstName lastName')
       .populate('advisor', 'firstName lastName')
       .sort({ createdAt: -1 });
+=======
+<<<<<<< HEAD
+    const Theses = await Thesis.find({ status: "approved", isPublic: "true" })
+      .populate({ path: "author", select: "firstName lastName", model: User })
+      .populate({ path: "advisor", select: "firstName lastName", model: User })
+      .sort({ createdAt: -1 });
+=======
+    // Ensure models are loaded and registered with mongoose used by connectDatabase()
+    const { Thesis } = await import('@/lib/models/Thesis');
+    await import('@/lib/models/Users');
+
+    const Theses = await Thesis.find({ status: 'approved', isPublic: true })
+      .populate('author', 'firstName lastName')
+      .populate('advisor', 'firstName lastName')
+      .sort({ createdAt: -1 })
+      .exec();
+>>>>>>> cfe90daa1880b2eccd992a5de8be2d5fecf36ca7
+>>>>>>> f26a0e447824de8a637212eaa3a0cd7f5dd9a8b3
 
     return NextResponse.json({ success: true, theses: Theses });
-
   } catch (error: any) {
-    console.error('Query Thesis Error:', error);
-    return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
+    console.error("Query Thesis Error:", error);
+    return NextResponse.json(
+      { success: false, error: "Server error" },
+      { status: 500 }
+    );
   }
 }
