@@ -37,7 +37,7 @@ export async function POST(req: Request) {
         user_id: user.user_id,
       },
       process.env.JWT_SECRET as string,
-      { expiresIn: '8h' }
+      { expiresIn: '1h' }
     );
 
     const serialized = serialize("token", token, {
