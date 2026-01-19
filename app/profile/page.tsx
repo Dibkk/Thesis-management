@@ -10,56 +10,107 @@ import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import Navbar from "@/components/navbar"
-import { User, Mail, Shield, Calendar, Edit, Save, X } from "lucide-react"
+import { User, Mail, Shield, Calendar, Edit, Save, X, Loader2, MessageSquare } from "lucide-react" 
+import { AnimatePresence} from "framer-motion"
+import { AlertCircle } from "lucide-react"
 
 interface UserProfile {
-  name: string
-  email: string
-  role: string
-  joinDate?: string
-  department?: string
-  studentId?: string
+  id: string;
+  firstname?: string;
+  lastname?: string;
+  email: string;
+  role: string;
+  joinDate?: string; 
+  department?: string;
+  studentId?: string; 
+  user_id?: string;  
+  bio?: string;
+  lineId?: string;
+  stats?: {
+    stat1: number;
+    stat2: number;
+    stat3: number;
+  };
 }
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [isEditing, setIsEditing] = useState(false)
-  const [editForm, setEditForm] = useState<UserProfile>({
-    name: "",
-    email: "",
-    role: "",
-    department: "",
-    studentId: "",
-  })
+  
+
+  const [editForm, setEditForm] = useState<Partial<UserProfile>>({}) 
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null); 
+  const [loadingUser, setLoadingUser] = useState(true); 
   const router = useRouter()
 
   useEffect(() => {
-    const userData = localStorage.getItem("user")
-    if (!userData) {
-      router.push("/login")
-      return
-    }
+    async function fetchUser() {
+      setLoadingUser(true);
+      try {
+        // Change to fetch from /api/profile to get stats
+        const res = await fetch('/api/profile'); 
+        if (!res.ok) throw new Error('Not authenticated');
 
-    const parsedUser = JSON.parse(userData)
-    // Add mock additional data
-    const fullUser = {
-      ...parsedUser,
-      joinDate: "January 2024",
-      department: parsedUser.role === "student" ? "Computer Science" : "Engineering",
-      studentId: parsedUser.role === "student" ? "CS2024001" : undefined,
+        const data = await res.json();
+        if (data.success) {
+          const fullUser = {
+            ...data.user,
+            joinDate: "January 2024", 
+            studentId: data.user.user_id, 
+            bio: data.user.bio || "",
+            lineId: data.user.lineId,
+            stats: data.stats // Add stats
+          }
+          setUser(fullUser);
+          setEditForm(fullUser); 
+        } else {
+          throw new Error(data.error);
+        }
+      } catch (error) {
+        router.push("/login");
+      } finally {
+        setLoadingUser(false);
+      }
     }
-
-    setUser(fullUser)
-    setEditForm(fullUser)
+    fetchUser();
   }, [router])
 
-  const handleSave = () => {
-    if (user) {
-      const updatedUser = { ...user, ...editForm }
-      setUser(updatedUser)
-      localStorage.setItem("user", JSON.stringify(updatedUser))
-      setIsEditing(false)
+  const handleSave = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PUT', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editForm), 
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        const updatedFullUser = {
+          ...data.user,
+          joinDate: user?.joinDate || "January 2024", 
+          studentId: data.user.user_id, 
+        };
+        localStorage.setItem("user", JSON.stringify(data.user)); 
+        setUser(updatedFullUser);
+        setEditForm(updatedFullUser);
+        setIsEditing(false);
+        setError(null);
+      } else {
+        setError(data.message || 'Failed to update profile.');
+      }
+    } catch (error: any) {
+      console.log('Profile update error:', error);
+      setError(error.message || 'Server error');
     }
+    setIsLoading(false);
   }
 
   const handleCancel = () => {
@@ -67,18 +118,93 @@ export default function ProfilePage() {
       setEditForm(user)
     }
     setIsEditing(false)
+    setError(null);
   }
 
-  if (!user) {
+  if (loadingUser || !user) { 
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
+        <Navbar />
+        <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center">
+          <motion.div
+            className="text-center space-y-6"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            {/* Animated Logo */}
+            <motion.div 
+              className="relative mx-auto w-24 h-24"
+              animate={{ 
+                rotate: 360,
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                ease: "linear" 
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-3xl opacity-20 blur-xl" />
+              <motion.div 
+                className="relative w-24 h-24 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl"
+                animate={{ 
+                  boxShadow: [
+                    "0 0 20px rgba(147, 51, 234, 0.3)",
+                    "0 0 60px rgba(147, 51, 234, 0.6)",
+                    "0 0 20px rgba(147, 51, 234, 0.3)",
+                  ]
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <User className="h-12 w-12 text-white" />
+              </motion.div>
+            </motion.div>
+            
+            {/* Loading Text */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h2 className="text-2xl font-heading font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Loading Profile
+              </h2>
+              <p className="text-muted-foreground mt-2">Please wait a moment...</p>
+            </motion.div>
+            
+            {/* Animated Dots */}
+            <div className="flex items-center justify-center gap-2">
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  className="w-3 h-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"
+                  animate={{
+                    scale: [1, 1.5, 1],
+                    opacity: [0.5, 1, 0.5],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    delay: i * 0.2,
+                  }}
+                />
+              ))}
+            </div>
+          </motion.div>
+        </div>
       </div>
     )
   }
 
+  const displayName = `${user.firstname || ''} ${user.lastname || ''}`.trim() || "User"
+  const initials = (user.firstname || 'U').charAt(0).toUpperCase()
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20">
       <Navbar />
 
       <motion.div
@@ -87,29 +213,46 @@ export default function ProfilePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-heading font-bold text-foreground mb-2">Profile</h1>
-          <p className="text-muted-foreground">Manage your account information and preferences</p>
+          <h1 className="text-4xl font-heading font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">Profile</h1>
+          <p className="text-muted-foreground text-lg">Manage your account information and preferences</p>
         </div>
+
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="mb-4 p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md flex items-center gap-2"
+            >
+              <AlertCircle className="h-4 w-4" />
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Card */}
           <motion.div
             className="lg:col-span-1"
-            whileHover={{ y: -2, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
-            transition={{ duration: 0.2 }}
+            whileHover={{ y: -4, boxShadow: "0 20px 40px -10px rgba(0, 0, 0, 0.15)" }}
+            transition={{ duration: 0.3 }}
           >
-            <Card className="rounded-2xl border-0 shadow-lg">
-              <CardContent className="p-6 text-center">
-                <Avatar className="h-24 w-24 mx-auto mb-4">
-                  <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-                    {user.name.charAt(0).toUpperCase()}
+            <Card className="rounded-3xl border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
+              <CardContent className="p-6 text-center relative">
+                <Avatar className="h-24 w-24 mx-auto mb-4 border-4 border-white dark:border-gray-800 shadow-xl mt-8">
+                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-3xl font-bold">
+                    {initials}
                   </AvatarFallback>
                 </Avatar>
-                <h2 className="text-xl font-heading font-bold text-foreground mb-2">{user.name}</h2>
-                <p className="text-muted-foreground mb-4">{user.email}</p>
-                <Badge className="mb-4 capitalize bg-gradient-to-r from-blue-600 to-green-600 text-white">
+                <h2 className="text-2xl font-heading font-bold text-foreground mb-2">{displayName}</h2>
+                <p className="text-muted-foreground mb-4 flex items-center justify-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  {user.email}
+                </p>
+                <Badge className="mb-6 capitalize bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-1.5 text-sm shadow-lg shadow-blue-500/30">
                   {user.role}
                 </Badge>
                 <div className="space-y-2 text-sm text-muted-foreground">
@@ -129,19 +272,25 @@ export default function ProfilePage() {
                       <span>ID: {user.studentId}</span>
                     </div>
                   )}
+                  {user.lineId && (
+                    <div className="flex items-center justify-center gap-2">
+                       <MessageSquare className="h-4 w-4" />
+                       <span>Line ID: {user.lineId}</span>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </motion.div>
 
-          {/* Profile Information */}
           <motion.div
-            className="lg:col-span-2"
+            className="lg:col-span-2 h-full"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            whileHover={{ boxShadow: "0 20px 40px -10px rgba(0, 0, 0, 0.15)" }}
           >
-            <Card className="rounded-2xl border-0 shadow-lg">
+            <Card className="rounded-3xl border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl h-full">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle className="font-heading">Personal Information</CardTitle>
@@ -150,18 +299,18 @@ export default function ProfilePage() {
                 {!isEditing ? (
                   <Button
                     onClick={() => setIsEditing(true)}
-                    className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg shadow-blue-500/30"
                   >
                     <Edit className="h-4 w-4 mr-2" />
                     Edit
                   </Button>
                 ) : (
                   <div className="flex gap-2">
-                    <Button onClick={handleSave} size="sm">
-                      <Save className="h-4 w-4 mr-2" />
+                    <Button onClick={handleSave} size="sm" disabled={isLoading}>
+                      {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                       Save
                     </Button>
-                    <Button onClick={handleCancel} variant="outline" size="sm">
+                    <Button onClick={handleCancel} variant="outline" size="sm" disabled={isLoading}>
                       <X className="h-4 w-4 mr-2" />
                       Cancel
                     </Button>
@@ -169,29 +318,54 @@ export default function ProfilePage() {
                 )}
               </CardHeader>
               <CardContent className="space-y-6">
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
+                    <Label htmlFor="firstname">First Name</Label>
                     {isEditing ? (
                       <motion.div
                         whileFocus={{ boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)" }}
                         transition={{ duration: 0.2 }}
                       >
                         <Input
-                          id="name"
-                          value={editForm.name}
-                          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                          id="firstname"
+                          value={editForm.firstname || ''}
+                          onChange={(e) => setEditForm({ ...editForm, firstname: e.target.value })}
                           className="focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
                         />
                       </motion.div>
                     ) : (
-                      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        <span>{user.name}</span>
+                      <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-900/10 dark:to-purple-900/10 rounded-xl border border-blue-500/20">
+                        <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        <span className="font-medium">{user.firstname || '...'}</span>
                       </div>
                     )}
                   </div>
 
+                  <div className="space-y-2">
+                    <Label htmlFor="lastname">Last Name</Label>
+                    {isEditing ? (
+                      <motion.div
+                        whileFocus={{ boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)" }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Input
+                          id="lastname"
+                          value={editForm.lastname || ''}
+                          onChange={(e) => setEditForm({ ...editForm, lastname: e.target.value })}
+                          className="focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
+                        />
+                      </motion.div>
+                    ) : (
+                      <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-900/10 dark:to-purple-900/10 rounded-xl border border-blue-500/20">
+                        <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        <span className="font-medium">{user.lastname || '...'}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
                     {isEditing ? (
@@ -208,18 +382,18 @@ export default function ProfilePage() {
                         />
                       </motion.div>
                     ) : (
-                      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-                        <Mail className="h-4 w-4 text-muted-foreground" />
-                        <span>{user.email}</span>
+                      <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-900/10 dark:to-purple-900/10 rounded-xl border border-blue-500/20">
+                        <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        <span className="font-medium">{user.email}</span>
                       </div>
                     )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="role">Role</Label>
-                    <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-                      <Shield className="h-4 w-4 text-muted-foreground" />
-                      <span className="capitalize">{user.role}</span>
+                    <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-900/10 dark:to-purple-900/10 rounded-xl border border-blue-500/20">
+                      <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <span className="capitalize font-medium">{user.role}</span>
                     </div>
                   </div>
 
@@ -245,29 +419,39 @@ export default function ProfilePage() {
                     )}
                   </div>
 
+                 
                   {user.role === "student" && (
                     <div className="space-y-2">
                       <Label htmlFor="studentId">Student ID</Label>
-                      {isEditing ? (
-                        <motion.div
-                          whileFocus={{ boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)" }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <Input
-                            id="studentId"
-                            value={editForm.studentId || ""}
-                            onChange={(e) => setEditForm({ ...editForm, studentId: e.target.value })}
-                            className="focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
-                          />
-                        </motion.div>
-                      ) : (
-                        <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          <span>{user.studentId || "Not specified"}</span>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span>{user.studentId || "Not specified"}</span>
+                      </div>
                     </div>
                   )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="lineId">Line ID</Label>
+                    {isEditing ? (
+                      <motion.div
+                        whileFocus={{ boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)" }}
+                        transition={{ duration: 0.2 }}
+                      >
+                         <Input
+                          id="lineId"
+                          value={editForm.lineId || ""}
+                          onChange={(e) => setEditForm({ ...editForm, lineId: e.target.value })}
+                          className="focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
+                          placeholder="Enter your Line ID"
+                        />
+                      </motion.div>
+                    ) : (
+                      <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                        <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                        <span>{user.lineId || "Not specified"}</span>
+                      </div>
+                    )}
+                  </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="joinDate">Join Date</Label>
@@ -288,43 +472,59 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
+          whileHover={{ boxShadow: "0 20px 40px -10px rgba(0, 0, 0, 0.15)" }}
         >
-          <Card className="rounded-2xl border-0 shadow-lg">
+          <Card className="rounded-3xl border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
             <CardHeader>
               <CardTitle className="font-heading">Account Statistics</CardTitle>
               <CardDescription>Your activity and engagement overview</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl">
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                    {user.role === "student" ? "3" : user.role === "advisor" ? "12" : "156"}
+                <motion.div 
+                  className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-2xl border border-blue-500/20 shadow-lg hover:shadow-xl transition-all"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                    {user.stats?.stat1 || 0}
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground font-medium">
                     {user.role === "student" ? "Submissions" : user.role === "advisor" ? "Students" : "Total Users"}
                   </div>
-                </div>
-                <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">
-                    {user.role === "student" ? "2" : user.role === "advisor" ? "8" : "89"}
+                </motion.div>
+                <motion.div 
+                  className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-2xl border border-green-500/20 shadow-lg hover:shadow-xl transition-all"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
+                    {user.stats?.stat2 || 0}
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground font-medium">
                     {user.role === "student" ? "Approved" : user.role === "advisor" ? "Completed" : "Total Theses"}
                   </div>
-                </div>
-                <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl">
-                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-2">
-                    {user.role === "student" ? "5" : user.role === "advisor" ? "3" : "12"}
+                </motion.div>
+                <motion.div 
+                  className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-2xl border border-purple-500/20 shadow-lg hover:shadow-xl transition-all"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                    {user.stats?.stat3 || 0}
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground font-medium">
                     {user.role === "student" ? "Feedback" : "This Month"}
                   </div>
-                </div>
+                </motion.div>
               </div>
             </CardContent>
           </Card>
         </motion.div>
       </motion.div>
     </div>
+
+    //   </motion.div>
+    // </div>
   )
 }

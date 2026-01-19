@@ -23,35 +23,7 @@ export default function LoginPage() {
     role: "",
   })
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault()
-  //   setError("")
-  //   setIsLoading(true)
-
-  //   await new Promise((resolve) => setTimeout(resolve, 1000))
-
-  //   // Test credentials: test@gmail.com / 1234
-  //   if (formData.email === "test@gmail.com" && formData.password === "1234" && formData.role) {
-  //     // Store user info in localStorage for demo purposes
-  //     localStorage.setItem(
-  //       "user",
-  //       JSON.stringify({
-  //         email: formData.email,
-  //         role: formData.role,
-  //         name: formData.role === "student" ? "John Doe" : formData.role === "advisor" ? "Dr. Smith" : "Admin User",
-  //       }),
-  //     )
-
-  //     // Redirect to dashboard
-  //     router.push("/dashboard")
-  //   } else {
-  //     setError("Invalid credentials. Use test@gmail.com / 1234 with any role.")
-  //   }
-
-  //   setIsLoading(false)
-  // }
-
-  const handleSubmit2 = async (e: React.FormEvent) => {
+    const handleSubmit2 = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setIsLoading(true)
@@ -70,10 +42,6 @@ export default function LoginPage() {
       const data = await response.json()
 
       if (data.success) {
-        // Store user info in localStorage
-        // localStorage.setItem("user", JSON.stringify(data.user))
-        
-        // Redirect to dashboard
         router.push("/dashboard")
       } else {
         setError(data.message || "Login failed")
@@ -93,11 +61,13 @@ export default function LoginPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-heading font-bold">Thesis Management</span>
+          <Link href="/" className="inline-flex items-center gap-3 mb-4">
+            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg shadow-blue-500/30">
+              <BookOpen className="h-7 w-7 text-white" />
+            </div>
+            <span className="text-2xl font-heading font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Thesis Management</span>
           </Link>
-          <h1 className="text-3xl font-heading font-bold text-foreground mb-2">Welcome Back</h1>
+          <h1 className="text-3xl font-heading font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">Welcome Back</h1>
           <p className="text-muted-foreground">Sign in to access your academic dashboard</p>
         </motion.div>
 
@@ -106,7 +76,7 @@ export default function LoginPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="shadow-2xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+          <Card className="shadow-2xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
             <CardHeader>
               <CardTitle className="font-heading">Sign In</CardTitle>
               <CardDescription>Enter your credentials to access your account</CardDescription>
@@ -230,11 +200,11 @@ export default function LoginPage() {
                   transition={{ delay: 0.5, duration: 0.5 }}
                 >
                   <p className="text-sm text-blue-800 dark:text-blue-300 font-medium mb-2">🔑 Test Credentials:</p>
-                  <div className="space-y-1">
+                  {/* <div className="space-y-1">
                     <p className="text-sm text-blue-700 dark:text-blue-400">📧 Email: test@gmail.com</p>
                     <p className="text-sm text-blue-700 dark:text-blue-400">🔒 Password: 1234</p>
                     <p className="text-sm text-blue-700 dark:text-blue-400">👤 Role: Any role</p>
-                  </div>
+                  </div> */}
                 </motion.div>
                 <p className="text-sm text-muted-foreground">
                   Don't have an account?{" "}

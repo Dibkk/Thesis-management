@@ -1,71 +1,69 @@
+// // app/api/query/thesis/[id]/route.ts
+// import { NextResponse } from 'next/server';
+// import { connectDatabase } from '@/lib/databaseconnect';
+// import { Thesis } from '@/lib/models/Thesis';
+// import { User } from '@/lib/models/Users'; 
 
-import type { NextApiRequest, NextApiResponse } from "next";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-import { connectDatabase } from "@/lib/databaseconnect";
-import mongoose from "mongoose";
+// export async function GET(request: Request, { params }: { params: { id: string } }) {
+//   try {
+//     await connectDatabase();
+//     // const id = params.id;
+//     const { id } = await params;
+
+//     const thesis = await Thesis.findById(id)
+//       .populate('author', 'firstName lastName email role department user_id')
+//       .populate('advisor', 'firstName lastName email');
+
+//     if (!thesis) {
+//       return NextResponse.json({ success: false, error: 'Thesis not found' }, { status: 404 });
+//     }
+
+//     return NextResponse.json({ success: true, thesis });
+
+//   } catch (error: any) {
+//     console.error('Get Thesis Detail Error:', error);
+//     return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
+//   }
+// }
+
+// app/api/query/thesis/[id]/route.ts
+import { NextResponse } from 'next/server';
+import { connectDatabase } from '@/lib/databaseconnect';
 import { Thesis } from '@/lib/models/Thesis';
+import { User } from '@/lib/models/Users';
 
-const uploadDir = path.join(process.cwd(), "uploads");
+export const dynamic = 'force-dynamic';
 
-// สร้างโฟลเดอร์เก็บไฟล์ถ้ายังไม่มี
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    await connectDatabase();
+    const { id } = await params;
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
-});
+    // 1. ดึงข้อมูล Thesis ปัจจุบัน
+    const thesis = await Thesis.findById(id)
+      .populate('author', 'firstName lastName email role department user_id')
+      .populate('advisor', 'firstName lastName email');
 
-const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype !== "application/pdf") {
-      return cb(new Error("Only PDF files are allowed"));
+    if (!thesis) {
+      return NextResponse.json({ success: false, error: 'Thesis not found' }, { status: 404 });
     }
-    cb(null, true);
-  },
-}).single("file");
 
-// === สร้าง schema สำหรับ metadata ===
-const thesisSchema = new mongoose.Schema({
-  user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  title: String,
-  file_path: String,
-  upload_date: { type: Date, default: Date.now },
-  status: { type: String, default: "pending" },
-});
+    // 2. (เพิ่ม) ค้นหา "Versions" อื่นๆ (Thesis ที่มี thesis_id เดียวกัน)
+    // เพื่อเอาไปทำ Dropdown เปลี่ยนเวอร์ชัน
+    const versions = await Thesis.find({ thesis_id: thesis.thesis_id })
+      .select('thesis_id version createdAt title status') // เลือกเฉพาะ field ที่จำเป็น
+      .sort({ version: -1 }); // เรียง ใหม่ -> เก่า
 
-const Thesis = mongoose.models.Thesis || mongoose.model("Thesis", thesisSchema);
+    console.log("Fetched Thesis Data:", { 
+        id: thesis._id, 
+        score: thesis.similarityScore, 
+        notes: thesis.privateNotes 
+    }); // LOG FETCHED DATA
 
-export const config = {
-  api: { bodyParser: false },
-};
+    return NextResponse.json({ success: true, thesis, versions });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  await connectDatabase();
-
-  upload(req as any, res as any, async (err) => {
-    if (err) return res.status(400).json({ error: err.message });
-
-    const { title, user_id } = req.body;
-    const file = req.file;
-
-    if (!file) return res.status(400).json({ error: "No file uploaded" });
-
-    const newThesis = new Thesis({
-      user_id,
-      title,
-      file_path: `/uploads/${file.filename}`,
-    });
-
-    await newThesis.save();
-
-    res.status(200).json({
-      message: "PDF uploaded and metadata saved",
-      thesis: newThesis,
-    });
-  });
+  } catch (error: any) {
+    console.error('Get Thesis Detail Error:', error);
+    return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
+  }
 }
