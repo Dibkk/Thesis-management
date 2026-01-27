@@ -154,7 +154,7 @@ export default function LoginPage() {
                   </motion.div>
                 </div>
 
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
                   <motion.div whileHover={{ opacity: 0.9 }} whileTap={{ opacity: 0.8 }} transition={{ duration: 0.2 }}>
                     <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
@@ -168,7 +168,7 @@ export default function LoginPage() {
                       </SelectContent>
                     </Select>
                   </motion.div>
-                </div>
+                </div> */}
 
                 <motion.div
                   whileHover={{ y: -1, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
