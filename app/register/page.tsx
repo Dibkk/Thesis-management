@@ -481,11 +481,12 @@ export default function RegisterPage() {
                       Only authorized faculty members can register with this
                       role.
                     </p>
+                    <hr />
                     <a
-                      className="text-xs text-muted-foreground border-2 rounded border-green-300 p-1.5 cursor-pointer"
+                      className="m-1.5 p-1.5 rounded-4xl text-base px-8 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-xl shadow-blue-500/30"
                       onClick={onSendEmail}
                     >
-                      send secret code to email
+                      Get Secret Code
                     </a>
                   </motion.div>
                 )}
