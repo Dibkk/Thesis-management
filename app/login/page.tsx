@@ -154,7 +154,7 @@ export default function LoginPage() {
                   </motion.div>
                 </div>
 
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
                   <motion.div whileHover={{ opacity: 0.9 }} whileTap={{ opacity: 0.8 }} transition={{ duration: 0.2 }}>
                     <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
@@ -168,7 +168,7 @@ export default function LoginPage() {
                       </SelectContent>
                     </Select>
                   </motion.div>
-                </div>
+                </div> */}
 
                 <motion.div
                   whileHover={{ y: -1, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
@@ -193,19 +193,19 @@ export default function LoginPage() {
               </form>
 
               <div className="mt-6 text-center">
-                <motion.div
+                {/* <motion.div
                   className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 border border-blue-200 dark:border-blue-800 rounded-lg shadow-sm"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5, duration: 0.5 }}
                 >
                   <p className="text-sm text-blue-800 dark:text-blue-300 font-medium mb-2">🔑 Test Credentials:</p>
-                  {/* <div className="space-y-1">
+                  <div className="space-y-1">
                     <p className="text-sm text-blue-700 dark:text-blue-400">📧 Email: test@gmail.com</p>
                     <p className="text-sm text-blue-700 dark:text-blue-400">🔒 Password: 1234</p>
                     <p className="text-sm text-blue-700 dark:text-blue-400">👤 Role: Any role</p>
-                  </div> */}
-                </motion.div>
+                  </div>
+                </motion.div> */}
                 <p className="text-sm text-muted-foreground">
                   Don't have an account?{" "}
                   <Link

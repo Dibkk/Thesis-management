@@ -311,13 +311,13 @@ export default function BrowsePage() {
                 whileTap={{ scale: 0.95 }}
                 hidden={!(user.role == "advisor")}
               >
-                <Button
+                {/* <Button
                   variant="outline"
                   onClick={handleExportCSV}
                   className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-purple-50 dark:hover:bg-purple-900/20 border-purple-200 dark:border-purple-800 transition-all duration-300"
                 >
                   <Download className="mr-2 h-4 w-4" /> Export CSV
-                </Button>
+                </Button> */}
               </motion.div>
             </div>
           </div>
@@ -907,7 +907,7 @@ export default function BrowsePage() {
 
                                 {/* Action buttons */}
                                 <div className="flex md:flex-col items-center gap-2 shrink-0 w-full md:w-auto">
-                                  <motion.div
+                                  {/* <motion.div
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     className="flex-1 md:flex-none w-full md:w-auto"
@@ -927,7 +927,7 @@ export default function BrowsePage() {
                                         Download
                                       </a>
                                     </Button>
-                                  </motion.div>
+                                  </motion.div> */}
                                   <motion.div
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
