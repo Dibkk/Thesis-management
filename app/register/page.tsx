@@ -61,7 +61,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     if (!pdpaConsent) {
-      setError("PDPA is required. ")
+      setError("PDPA is required. ");
       setIsLoading(false);
       return;
     }
@@ -114,6 +114,34 @@ export default function RegisterPage() {
       setError("Error: " + error.message);
     }
     setIsLoading(false);
+  };
+
+  const onSendEmail = async () => {
+    setError("");
+    const regex = /\d/;
+
+    if (formData.role !== "advisor" && regex.test(formData.email)) {
+      setError("You are not Advisor.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          advisorEmail: formData.email,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        setError(data.message || "Send email failed");
+      }
+    } catch (error: any) {
+      setError("Error: " + error.message);
+    }
   };
 
   return (
@@ -348,7 +376,7 @@ export default function RegisterPage() {
                           <SelectItem value="student">Student</SelectItem>
                           <SelectItem value="advisor">Advisor</SelectItem>
                           {/* Admin ก็อาจจะใช้รหัสเดียวกับ Advisor หรือคนละรหัสก็ได้ */}
-                          <SelectItem value="admin">Administrator</SelectItem>
+                          {/* <SelectItem value="admin">Administrator</SelectItem> */}
                         </SelectContent>
                       </Select>
                     </motion.div>
@@ -412,7 +440,7 @@ export default function RegisterPage() {
                 )}
 
                 {/* --- ส่วน Advisor Secret Code (โชว์เมื่อเป็น Advisor หรือ Admin) --- */}
-                {(formData.role === "advisor" || formData.role === "admin") && (
+                {formData.role === "advisor" && (
                   <motion.div
                     className="space-y-2"
                     initial={{ opacity: 0, height: 0 }}
@@ -453,6 +481,12 @@ export default function RegisterPage() {
                       Only authorized faculty members can register with this
                       role.
                     </p>
+                    <a
+                      className="text-xs text-muted-foreground border-2 rounded border-green-300 p-1.5 cursor-pointer"
+                      onClick={onSendEmail}
+                    >
+                      send secret code to email
+                    </a>
                   </motion.div>
                 )}
                 {/* ----------------------------------------------------------- */}
