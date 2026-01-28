@@ -50,7 +50,7 @@ const reportTemplates = [
     category: "Analytics",
     icon: <TrendingUp className="h-6 w-6" />,
     color: "text-green-500 bg-green-50",
-    fields: ["thesis_title", "author", "download_count", "category", "publish_date"],
+    fields: ["thesis_title", "category", "author", "publish_date", "download_count"],
   },
   {
     id: "department-overview",
@@ -70,15 +70,15 @@ const reportTemplates = [
     color: "text-indigo-500 bg-indigo-50",
     fields: ["advisor_name", "department", "total_students", "active_theses", "completed_theses"],
   },
-  {
-    id: "at-risk-students",
-    name: "At-Risk Students Report",
-    description: "Identify students with no thesis updates for >30 days",
-    category: "Management",
-    icon: <AlertCircle className="h-6 w-6" />,
-    color: "text-red-500 bg-red-50",
-    fields: ["student_name", "email", "thesis_title", "advisor", "last_update", "days_inactive", "status"],
-  },
+//   {
+//     id: "at-risk-students",
+//     name: "At-Risk Students Report",
+//     description: "Identify students with no thesis updates for >30 days",
+//     category: "Management",
+//     icon: <AlertCircle className="h-6 w-6" />,
+//     color: "text-red-500 bg-red-50",
+//     fields: ["student_name", "email", "thesis_title", "advisor", "last_update", "days_inactive", "status"],
+//   },
 ]
 
 export default function ReportsPage() {
@@ -289,7 +289,7 @@ export default function ReportsPage() {
                         {template.description}
                     </p>
                     <div className="flex items-center text-sm text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-[-10px] group-hover:translate-x-0 duration-300">
-                        Configure Report <ChevronRight className="ml-1 h-4 w-4" />
+                        Get Report <ChevronRight className="ml-1 h-4 w-4" />
                     </div>
                     </CardContent>
                 </Card>
