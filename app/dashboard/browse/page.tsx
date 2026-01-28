@@ -245,6 +245,31 @@ export default function BrowsePage() {
      return <LoadingScreen />
   }
 
+  const savelog = async (_id: string) => {
+    console.log(user.id)
+    console.log(_id)
+
+    try {
+      const res = await fetch('/api/log-download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user.id,
+          thesis_id: _id,
+        })
+      });
+
+      if (res.ok) {
+        
+      } else {
+        console.error("Failed Save log");
+      }
+
+    } catch (error) {
+      console.error("Error Save log:", error);
+    }
+  }
+
   return (
     <div className="p-6 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 min-h-screen">
       <div className="mx-auto space-y-8">
@@ -269,6 +294,7 @@ export default function BrowsePage() {
                   <Download className="mr-2 h-4 w-4" /> Export CSV
                 </Button>
               </motion.div>
+              {/* <button onClick={() => savelog("")}>Click</button> */}
             </div>
           </div>
         </div>
@@ -756,7 +782,7 @@ export default function BrowsePage() {
                                              className="w-full bg-white/60 dark:bg-gray-900/40 hover:bg-blue-50 dark:hover:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 font-medium transition-all" 
                                              asChild
                                           >
-                                             <a href={`/api/thesis/${thesis._id}/file`} download className="flex items-center justify-center gap-2">
+                                             <a onClick={() => savelog(thesis._id)} href={`/api/thesis/${thesis._id}/file`} download className="flex items-center justify-center gap-2">
                                                 <Download className="h-4 w-4" /> Download
                                              </a>
                                           </Button>
