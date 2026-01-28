@@ -75,7 +75,11 @@ export async function POST(req: Request) {
       if (!thesis) {
         return NextResponse.json({ success: false, error: "Thesis not found." }, { status: 404 });
       }
-      if (thesis.author.toString() !== secureAuthorId) {
+      // Check if user is Author OR Advisor
+      const isAuthor = thesis.author.toString() === secureAuthorId;
+      const isAdvisor = decoded.role === 'advisor' && (thesis.advisor.toString() === secureAuthorId || (typeof thesis.advisor === 'object' && thesis.advisor._id.toString() === secureAuthorId));
+
+      if (!isAuthor && !isAdvisor) {
         return NextResponse.json({ success: false, error: "Unauthorized to update this thesis." }, { status: 403 });
       }
 

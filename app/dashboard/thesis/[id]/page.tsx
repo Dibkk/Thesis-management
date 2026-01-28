@@ -894,7 +894,7 @@ export default function ThesisDetailPage() {
                           </Button>
                           
                           <Button variant="outline" className="w-full mt-2" asChild>
-                              <Link href="/dashboard/upload">
+                              <Link href={`/dashboard/upload?thesisId=${thesis._id}`}>
                                   <UploadCloud className="mr-2 h-4 w-4" /> Upload New Version
                               </Link>
                           </Button>

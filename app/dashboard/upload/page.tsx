@@ -64,6 +64,7 @@ function UploadPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const cloneId = searchParams.get('cloneId')
+  const paramThesisId = searchParams.get('thesisId') // Get thesisId from URL
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -214,6 +215,38 @@ function UploadPageContent() {
     // }
   }, [cloneId]); // เอา user ออกจาก dependency array เพื่อให้ทำงานทันทีที่มี cloneId
 
+  // 4. Handle thesisId param (For Advisors/Teachers updating specific thesis)
+  useEffect(() => {
+    if (!paramThesisId) return;
+    
+    setUploadMode('update');
+    setSelectedThesisId(paramThesisId);
+
+    // Fetch the thesis details to populate the list (because it might not be in 'myTheses' for advisors)
+    async function fetchTargetThesis() {
+      try {
+        const res = await fetch(`/api/query/thesis/${paramThesisId}`);
+        const data = await res.json();
+        if (data.success && data.thesis) {
+            const t = data.thesis;
+            // Add to myTheses so the Select component can show it
+            setMyTheses(prev => {
+                const exists = prev.find(item => item._id === t._id);
+                if (exists) return prev;
+                return [...prev, {
+                    _id: t._id,
+                    title: t.title,
+                    thesis_id: t.thesis_id,
+                    version: t.version
+                }];
+            });
+        }
+      } catch (e) {
+        console.error("Failed to fetch target thesis", e);
+      }
+    }
+    fetchTargetThesis();
+  }, [paramThesisId]);
 
   const removeFile = (id: string) => {
     setUploadedFiles((prev) => prev.filter((f) => f.id !== id))
@@ -436,9 +469,13 @@ function UploadPageContent() {
                   <CardContent className="p-6 space-y-5">
                     <div className="space-y-2">
                       <Label htmlFor="thesis-select" className="text-sm font-semibold">Select Thesis</Label>
-                      <Select value={selectedThesisId} onValueChange={setSelectedThesisId}>
+                      <Select 
+                        value={selectedThesisId} 
+                        onValueChange={setSelectedThesisId}
+                        disabled={!!paramThesisId} // Lock if coming from review page
+                      >
                         <SelectTrigger className="rounded-xl w-full">
-                          <SelectValue placeholder="Select a thesis..." />
+                          <SelectValue placeholder="Select a thesis..." /> 
                         </SelectTrigger>
                         <SelectContent>
                           {myTheses.map((t) => (
