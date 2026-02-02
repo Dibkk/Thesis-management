@@ -552,7 +552,7 @@ export default function ThesisDetailPage() {
 
               <div className="lg:col-span-2 space-y-6">
                   <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-                      <TabsList className="grid w-full grid-cols-4 mb-4 h-11 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border border-border/40 shadow-lg">
+                      <TabsList className="grid w-full grid-cols-4 mb-4 h-auto p-1 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border border-border/40 shadow-lg">
                           <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 font-medium py-2.5">Overview</TabsTrigger>
                           <TabsTrigger value="timeline" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 font-medium py-2.5">Timeline</TabsTrigger>
                           <TabsTrigger value="meetings" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/30 font-medium py-2.5">Meetings</TabsTrigger>
@@ -893,11 +893,13 @@ export default function ThesisDetailPage() {
                               <a href={`/api/thesis/${thesis._id}/file`} download><Download className="mr-2 h-4 w-4" /> Download Latest</a>
                           </Button>
                           
-                          <Button variant="outline" className="w-full mt-2" asChild>
-                              <Link href={`/dashboard/upload?thesisId=${thesis._id}`}>
-                                  <UploadCloud className="mr-2 h-4 w-4" /> Upload New Version
-                              </Link>
-                          </Button>
+                          {thesis.status.toLowerCase() !== 'approved' && (
+                              <Button variant="outline" className="w-full mt-2" asChild>
+                                  <Link href={`/dashboard/upload?thesisId=${thesis._id}`}>
+                                      <UploadCloud className="mr-2 h-4 w-4" /> Upload New Version
+                                  </Link>
+                              </Button>
+                          )}
 
                           {thesis.chapters && thesis.chapters.length > 0 && thesis.status !== 'approved' && (
                               <>

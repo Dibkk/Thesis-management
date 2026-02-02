@@ -381,7 +381,7 @@ export default function MyThesisPage() {
                       </motion.div>
                       
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Button variant="outline" size="sm" asChild className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm hover:bg-purple-50 dark:hover:bg-purple-900/20 border-purple-200 dark:border-purple-800 hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-300">
+                        <Button variant="outline" size="sm" asChild className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm hover:bg-purple-50 dark:hover:bg-purple-900/20 border-purple-200 dark:border-purple-800 hover:border-purple-300 dark:hover:border-purple-700 hover:text-purple-700 dark:hover:text-purple-200 transition-all duration-300">
                           <Link href={`/dashboard/thesis/${thesis._id}#feedback`}>
                             <MessageSquare className="h-4 w-4 mr-2" />
                             Feedback
@@ -390,7 +390,7 @@ export default function MyThesisPage() {
                       </motion.div>
                       
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Button variant="outline" size="sm" asChild className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm hover:bg-green-50 dark:hover:bg-green-900/20 border-green-200 dark:border-green-800 hover:border-green-300 dark:hover:border-green-700 transition-all duration-300">
+                        <Button variant="outline" size="sm" asChild className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm hover:bg-green-50 dark:hover:bg-green-900/20 border-green-200 dark:border-green-800 hover:border-green-300 dark:hover:border-green-700 hover:text-green-700 dark:hover:text-green-200 transition-all duration-300">
                           <a href={`/api/thesis/${thesis._id}/file`} download>
                             <Download className="h-4 w-4 mr-2" />
                             Download PDF

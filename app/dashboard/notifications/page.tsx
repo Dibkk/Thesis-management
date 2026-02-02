@@ -6,12 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
 import { CheckCircle, XCircle, Clock, Bell, BellOff, MessageSquare, Calendar, Settings, Trash2, Loader2, Info, AlertCircle } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
 
 interface UINotification {
   id: string
@@ -24,23 +19,13 @@ interface UINotification {
   actionUrl: string | null
 }
 
-const notificationSettings = {
-  emailNotifications: true,
-  pushNotifications: true,
-  thesisUpdates: true,
-  deadlineReminders: true,
-  feedbackAlerts: true,
-  meetingReminders: true,
-  systemUpdates: false,
-}
+
 
 export default function NotificationsPage() {
   const [notifs, setNotifs] = useState<UINotification[]>([])
   const [loading, setLoading] = useState(true)
-  const [settings, setSettings] = useState(notificationSettings)
   const [filter, setFilter] = useState("all")
   const router = useRouter()
-  const { toast } = useToast()
 
   const fetchNotifications = async () => {
     setLoading(true);
@@ -71,13 +56,7 @@ export default function NotificationsPage() {
     fetchNotifications();
   }, [])
 
-  const handleSaveSettings = () => {
-      // In a real app, this would save to backend/localstorage
-      toast({
-          title: "Settings saved",
-          description: "Your notification preferences have been updated.",
-      })
-  }
+
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -250,15 +229,9 @@ export default function NotificationsPage() {
           </div>
         </div>
 
-        <Tabs defaultValue="notifications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 h-11 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 shadow-lg rounded-xl">
-            <TabsTrigger value="notifications" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-purple-500/30 transition-all duration-300 py-2 px-3 text-sm font-medium">
-              Notifications {unreadCount > 0 && `(${unreadCount})`}
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-pink-500/30 transition-all duration-300 py-2 px-3 text-sm font-medium">Settings</TabsTrigger>
-          </TabsList>
+        <div className="space-y-6">
 
-          <TabsContent value="notifications" className="space-y-6">
+
             {/* Filter Tabs */}
             <div className="flex items-center gap-2">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -412,117 +385,8 @@ export default function NotificationsPage() {
                 })
               )}
             </div>
-          </TabsContent>
-
-          <TabsContent value="settings" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-heading">Notification Preferences</CardTitle>
-                <CardDescription>Customize how and when you receive notifications</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* General Settings */}
-                <div className="space-y-4">
-                  <h4 className="font-medium text-foreground">General</h4>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="email-notifications">Email Notifications</Label>
-                        <p className="text-sm text-muted-foreground">Receive notifications via email</p>
-                      </div>
-                      <Switch
-                        id="email-notifications"
-                        checked={settings.emailNotifications}
-                        onCheckedChange={(checked) => setSettings({ ...settings, emailNotifications: checked })}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="push-notifications">Push Notifications</Label>
-                        <p className="text-sm text-muted-foreground">Receive browser push notifications</p>
-                      </div>
-                      <Switch
-                        id="push-notifications"
-                        checked={settings.pushNotifications}
-                        onCheckedChange={(checked) => setSettings({ ...settings, pushNotifications: checked })}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Specific Notifications */}
-                <div className="space-y-4">
-                  <h4 className="font-medium text-foreground">Notification Types</h4>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="thesis-updates">Thesis Updates</Label>
-                        <p className="text-sm text-muted-foreground">Approval, rejection, and status changes</p>
-                      </div>
-                      <Switch
-                        id="thesis-updates"
-                        checked={settings.thesisUpdates}
-                        onCheckedChange={(checked) => setSettings({ ...settings, thesisUpdates: checked })}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="deadline-reminders">Deadline Reminders</Label>
-                        <p className="text-sm text-muted-foreground">Upcoming submission and review deadlines</p>
-                      </div>
-                      <Switch
-                        id="deadline-reminders"
-                        checked={settings.deadlineReminders}
-                        onCheckedChange={(checked) => setSettings({ ...settings, deadlineReminders: checked })}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="feedback-alerts">Feedback Alerts</Label>
-                        <p className="text-sm text-muted-foreground">New comments and reviews from advisors</p>
-                      </div>
-                      <Switch
-                        id="feedback-alerts"
-                        checked={settings.feedbackAlerts}
-                        onCheckedChange={(checked) => setSettings({ ...settings, feedbackAlerts: checked })}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="meeting-reminders">Meeting Reminders</Label>
-                        <p className="text-sm text-muted-foreground">Scheduled meetings with advisors</p>
-                      </div>
-                      <Switch
-                        id="meeting-reminders"
-                        checked={settings.meetingReminders}
-                        onCheckedChange={(checked) => setSettings({ ...settings, meetingReminders: checked })}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="system-updates">System Updates</Label>
-                        <p className="text-sm text-muted-foreground">Maintenance and system announcements</p>
-                      </div>
-                      <Switch
-                        id="system-updates"
-                        checked={settings.systemUpdates}
-                        onCheckedChange={(checked) => setSettings({ ...settings, systemUpdates: checked })}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="flex justify-end">
-                  <Button onClick={handleSaveSettings}>Save Preferences</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          
+        </div>
       </div>
     </div>
   )

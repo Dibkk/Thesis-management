@@ -265,13 +265,15 @@ export default function DashboardPage() {
     <div className="flex gap-3 overflow-x-auto pb-2 px-1 py-2 -mx-1 -my-2">
       {user.role === 'student' ? (
         <>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-300" asChild>
-              <Link href="/dashboard/upload">
-                <UploadCloud className="h-4 w-4" /> Upload New Version
-              </Link>
-            </Button>
-          </motion.div>
+          {activeThesis?.status.toLowerCase() !== 'approved' && (
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-300" asChild>
+                <Link href={`/dashboard/upload${selectedThesisId ? `?thesisId=${selectedThesisId}` : ''}`}>
+                  <UploadCloud className="h-4 w-4" /> Upload New Version
+                </Link>
+              </Button>
+            </motion.div>
+          )}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-green-50 dark:hover:bg-green-900/20 border-green-200 dark:border-green-800 hover:border-green-300 dark:hover:border-green-700 text-green-700 dark:text-green-300 hover:text-green-800 dark:hover:text-green-200 transition-all duration-300" asChild>
               <Link href={`/dashboard/thesis/${selectedThesisId}#feedback`}>
@@ -367,24 +369,20 @@ export default function DashboardPage() {
       ) : (
         <>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-green-50 dark:hover:bg-green-900/20 border-green-200 dark:border-green-800 hover:border-green-300 dark:hover:border-green-700 transition-all duration-300" asChild>
+            <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-green-50 dark:hover:bg-green-900/20 border-green-200 dark:border-green-800 hover:border-green-300 dark:hover:border-green-700 hover:text-green-700 dark:hover:text-green-200 transition-all duration-300" asChild>
                <Link href="/dashboard/approvals">
                  <CheckCircle className="h-4 w-4 text-green-500" /> Review Pending
                </Link>
             </Button>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300" asChild>
+            <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 hover:text-blue-700 dark:hover:text-blue-200 transition-all duration-300" asChild>
                <Link href="/dashboard/students">
                  <Users className="h-4 w-4 text-blue-500" /> My Students
                </Link>
             </Button>
           </motion.div>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-orange-50 dark:hover:bg-orange-900/20 border-orange-200 dark:border-orange-800 hover:border-orange-300 dark:hover:border-orange-700 transition-all duration-300">
-               <Mail className="h-4 w-4 text-orange-500" /> Email All
-            </Button>
-          </motion.div>
+
         </>
       )}
     </div>
@@ -569,13 +567,15 @@ export default function DashboardPage() {
                         Chapter Progress
                       </div>
                   </div>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-300" asChild>
-                        <Link href="/dashboard/upload">
-                          <UploadCloud className="h-4 w-4" /> Upload New Chapter
-                        </Link>
-                      </Button>
-                    </motion.div>
+                    {passedChaptersCount < 5 && (
+                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                        <Button variant="outline" className="gap-2 whitespace-nowrap bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 transition-all duration-300" asChild>
+                          <Link href={`/dashboard/upload${activeThesis ? `?thesisId=${activeThesis._id}` : ''}`}>
+                            <UploadCloud className="h-4 w-4" /> Upload New Chapter
+                          </Link>
+                        </Button>
+                      </motion.div>
+                    )}
                </CardTitle>
                <CardDescription>Visual breakdown of your thesis chapters</CardDescription>
              </CardHeader>

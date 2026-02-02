@@ -221,7 +221,7 @@ export default function ReviewsPage() {
         </div>
 
       <Tabs defaultValue="pending" className="space-y-8">
-        <TabsList className="grid w-full grid-cols-2 h-11 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 rounded-xl shadow-lg">
+        <TabsList className="grid w-full grid-cols-2 h-auto p-1 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 rounded-xl shadow-lg">
           <TabsTrigger value="pending" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-purple-500/30 transition-all duration-300 py-2.5 px-3 text-sm font-medium">
               Pending ({pendingReviews.length})
           </TabsTrigger>
@@ -275,7 +275,7 @@ export default function ReviewsPage() {
                               </div>
                           </div>
                           <Link href={`/dashboard/thesis/${thesis._id}`} className="block group-hover:text-primary transition-colors">
-                             <h3 className="text-xl font-heading font-bold text-gray-900 dark:text-gray-100 leading-tight">
+                             <h3 className="text-xl font-heading font-bold text-gray-900 dark:text-gray-100 leading-tight hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-all">
                                  {thesis.title}
                              </h3>
                           </Link>
@@ -294,10 +294,7 @@ export default function ReviewsPage() {
                             <Clock className="h-3.5 w-3.5 mr-1.5 inline" />
                             {thesis.status}
                           </Badge>
-                          <div className={`text-xs font-semibold px-3 py-1.5 rounded-lg border flex items-center gap-1.5 shadow-sm ${getScoreColor(thesis.similarityScore || 0)}`}>
-                              <Percent className="h-3.5 w-3.5" />
-                              {thesis.similarityScore ?? 0}%
-                          </div>
+
                         </div>
                       </div>
 
@@ -350,7 +347,7 @@ export default function ReviewsPage() {
                             </Link>
                           </Button>
                           
-                          <Button variant="outline" size="sm" asChild className="border-slate-200 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-slate-800 rounded-lg shadow-sm">
+                          <Button variant="outline" size="sm" asChild className="border-slate-200 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white rounded-lg shadow-sm">
                             <a href={`/api/thesis/${thesis._id}/file`} download target="_blank">
                                 <Eye className="h-4 w-4 mr-2" />
                                 View File
@@ -431,9 +428,9 @@ export default function ReviewsPage() {
                              </span>
                         </div>
                         <Link href={`/dashboard/thesis/${thesis._id}`} className="block group-hover:text-primary transition-colors">
-                            <h3 className="text-xl font-heading font-bold text-gray-900 dark:text-gray-100 leading-tight">
-                                {thesis.title}
-                            </h3>
+                                <h3 className="text-xl font-heading font-bold text-gray-900 dark:text-gray-100 leading-tight hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-all">
+                                    {thesis.title}
+                                </h3>
                         </Link>
                         <div className="flex items-center gap-2 text-sm">
                           <div className="h-7 w-7 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center text-slate-700 dark:text-slate-300 shadow-sm">
@@ -450,10 +447,7 @@ export default function ReviewsPage() {
                               {thesis.status === 'approved' ? <CheckCircle className="h-3.5 w-3.5 mr-1.5 inline" /> : <XCircle className="h-3.5 w-3.5 mr-1.5 inline" />}
                               {thesis.status}
                           </Badge>
-                          <div className={`text-xs font-semibold px-3 py-1.5 rounded-lg border flex items-center gap-1.5 shadow-sm ${getScoreColor(thesis.similarityScore || 0)}`}>
-                              <Percent className="h-3.5 w-3.5" />
-                              {thesis.similarityScore ?? 0}%
-                          </div>
+
                       </div>
                     </div>
 
@@ -504,7 +498,7 @@ export default function ReviewsPage() {
                                 Full Details
                             </Link>
                         </Button>
-                        <Button variant="outline" size="sm" asChild className="border-slate-200 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-slate-800 rounded-lg shadow-sm">
+                        <Button variant="outline" size="sm" asChild className="border-slate-200 hover:bg-slate-50 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white rounded-lg shadow-sm">
                             <a href={`/api/thesis/${thesis._id}/file`} download target="_blank">
                                 <Eye className="h-4 w-4 mr-2" />
                                 View File

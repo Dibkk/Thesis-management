@@ -49,6 +49,13 @@ interface ExistingThesis {
   title: string;
   thesis_id: string;
   version: number;
+  chapterApproval?: {
+      chapter1: boolean;
+      chapter2: boolean;
+      chapter3: boolean;
+      chapter4: boolean;
+      chapter5: boolean;
+  }
 }
 
 export default function UploadPage() {
@@ -197,11 +204,15 @@ function UploadPageContent() {
               category: t.category || "",
               advisor: advisorId,
               year: t.year || new Date().getFullYear().toString(),
-              department: t.department || prev.department
+              department: t.department || prev.department,
+              // Keep other data fresh although not in form
             };
             console.log("Setting Form Data to:", newData);
             return newData;
           });
+          
+          // Also set logic for chapter approval if needed for clone? 
+          // (Usually clone is for NEW submission, so maybe not critical here, but consistancy is good)
         }
       } catch (error) {
         console.error("Failed to load clone data:", error);
@@ -237,7 +248,8 @@ function UploadPageContent() {
                     _id: t._id,
                     title: t.title,
                     thesis_id: t.thesis_id,
-                    version: t.version
+                    version: t.version,
+                    chapterApproval: t.chapterApproval
                 }];
             });
         }
@@ -488,19 +500,47 @@ function UploadPageContent() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="chapter-select" className="text-sm font-semibold">Chapter Number</Label>
-                      <Select value={selectedChapter} onValueChange={setSelectedChapter}>
-                        <SelectTrigger className="rounded-xl w-full">
-                          <SelectValue placeholder="Select chapter..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">📖 Chapter 1</SelectItem>
-                          <SelectItem value="2">📖 Chapter 2</SelectItem>
-                          <SelectItem value="3">📖 Chapter 3</SelectItem>
-                          <SelectItem value="4">📖 Chapter 4</SelectItem>
-                          <SelectItem value="5">📖 Chapter 5</SelectItem>
-                          <SelectItem value="full">📚 Full Thesis</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {(() => {
+                           const currentThesis = myTheses.find(t => t._id === selectedThesisId);
+                           const allChaptersApproved = currentThesis?.chapterApproval && 
+                               currentThesis.chapterApproval.chapter1 &&
+                               currentThesis.chapterApproval.chapter2 &&
+                               currentThesis.chapterApproval.chapter3 &&
+                               currentThesis.chapterApproval.chapter4 &&
+                               currentThesis.chapterApproval.chapter5;
+                           
+                           // If all chapters approved, force 'full' selection and maybe disable interaction
+                           if (allChaptersApproved && selectedChapter !== 'full') {
+                               // Use timeout to avoid render-loop if done directly in render
+                               setTimeout(() => setSelectedChapter('full'), 0);
+                           }
+
+                           return (
+                              <Select 
+                                value={selectedChapter} 
+                                onValueChange={setSelectedChapter}
+                                disabled={!!allChaptersApproved}
+                              >
+                                <SelectTrigger className="rounded-xl w-full">
+                                  <SelectValue placeholder="Select chapter..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {allChaptersApproved ? (
+                                      <SelectItem value="full">📚 Full Thesis (All Chapters Passed)</SelectItem>
+                                  ) : (
+                                      <>
+                                          <SelectItem value="1">📖 Chapter 1</SelectItem>
+                                          <SelectItem value="2">📖 Chapter 2</SelectItem>
+                                          <SelectItem value="3">📖 Chapter 3</SelectItem>
+                                          <SelectItem value="4">📖 Chapter 4</SelectItem>
+                                          <SelectItem value="5">📖 Chapter 5</SelectItem>
+                                          <SelectItem value="full">📚 Full Thesis</SelectItem>
+                                      </>
+                                  )}
+                                </SelectContent>
+                              </Select>
+                           );
+                      })()}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="description" className="text-sm font-semibold">Chapter Description (Optional)</Label>
