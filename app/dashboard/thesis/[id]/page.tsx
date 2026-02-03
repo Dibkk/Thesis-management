@@ -140,6 +140,7 @@ export default function ThesisDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [processingAction, setProcessingAction] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [numberChecked, setnumberChecked] = useState<any>(null);
 
   // New State for Inputs
   const [similarityScore, setSimilarityScore] = useState<number | string>("");
@@ -215,6 +216,8 @@ export default function ThesisDetailPage() {
 
                 if (dataThesis.thesis.chapterApproval) {
                     setChapters(dataThesis.thesis.chapterApproval);
+                    setnumberChecked(Object.values(dataThesis.thesis.chapterApproval).filter(Boolean).length);
+                    // console.log("Obj number: " ,Object.values(dataThesis.thesis.chapterApproval).filter(Boolean).length);
                 }
             }
 
@@ -253,6 +256,7 @@ export default function ThesisDetailPage() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ chapterApproval: newChapters })
           });
+          setnumberChecked(Object.values(newChapters).filter(Boolean).length);
       } catch (error) {
           console.error("Failed to update chapter:", error);
       }
@@ -653,6 +657,13 @@ export default function ThesisDetailPage() {
                                   <CardDescription>Track the approval status of each chapter.</CardDescription>
                               </CardHeader>
                               <CardContent>
+                                        <div className="mt-3.5 mb-3.5">
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="font-medium">Overall Completion</span>
+                                                <span className="text-muted-foreground">{Math.round(numberChecked)*20}%</span>
+                                            </div>
+                                            <Progress value={numberChecked*20} className="h-3" />
+                                        </div>
                                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                       {[1, 2, 3, 4, 5].map((num) => {
                                           const key = `chapter${num}` as keyof typeof chapters;
@@ -670,31 +681,32 @@ export default function ThesisDetailPage() {
                                               </div>
                                           )
                                       })}
+                                      
                                   </div>
                               </CardContent>
                           </Card>
 
                           {isAdvisor && (
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                  <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
+                            <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                                 {/* <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
                                       <CardHeader>
                                           <CardTitle className="flex items-center gap-2 text-base">
                                               <Percent className="h-4 w-4 text-orange-500" /> Score
                                           </CardTitle>
                                       </CardHeader>
                                       <CardContent className="flex flex-col gap-4">
-                                          <div className="flex items-center justify-between">
+                                          <div className="flex items-centexr justify-between">
                                               <div className="flex flex-col">
                                                   <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Current Score</span>
-                                                  {/* <div className={`text-4xl font-bold ${getScoreColor(thesis?.similarityScore || 0)}`}> */}
+                                                  no <div className={`text-4xl font-bold ${getScoreColor(thesis?.similarityScore || 0)}`}></div>
                                                   <div className={`text-4xl font-bold }`}>
                                                       {thesis?.similarityScore ?? 0} point
                                                   </div>
                                               </div>
                                               <div></div>
-                                              {/* <div className={`px-3 py-1 rounded-full text-xs font-medium ${getScoreBg(thesis?.similarityScore || 0)} ${getScoreColor(thesis?.similarityScore || 0)}`}>
-                                                  {(thesis?.similarityScore || 0) < 20 ? "Low Risk" : (thesis?.similarityScore || 0) < 50 ? "Moderate" : "High Risk"}
-                                              </div> */}
+                                              <div className={`px-3 py-1 rounded-full text-xs font-medium ${getScoreBg(thesis?.similarityScore || 0)} ${getScoreColor(thesis?.similarityScore || 0)}`}>
+                                                no  {(thesis?.similarityScore || 0) < 20 ? "Low Risk" : (thesis?.similarityScore || 0) < 50 ? "Moderate" : "High Risk"}
+                                              </div>
                                           </div>
                                           <Separator />
                                           <div className="space-y-2">
@@ -715,7 +727,7 @@ export default function ThesisDetailPage() {
                                               </div>
                                           </div>
                                       </CardContent>
-                                  </Card>
+                                  </Card> */}
 
                                   <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
                                       <CardHeader>
